@@ -418,5 +418,12 @@ $script:SourceRoot=if(Test-Path(Join-Path $DotfilesDir 'dotfiles\components.tsv'
 $selected=Select-Components (Read-Manifest)
 if($Check){$failed=$false;foreach($row in $selected){if(-not(Test-Component $row)){$failed=$true}};if($failed){throw 'Dotfiles check failed.'};Write-Ok 'Windows Dotfiles check passed.';exit 0}
 foreach($row in $selected){Install-Package $row};foreach($row in $selected){Install-Artifact $row}
-if($InstallYaziPlugins){if($selected.id -notcontains 'yazi'){throw '-InstallYaziPlugins requires yazi.'};$ya=Get-App 'ya.exe';if(-not $ya){throw 'ya.exe is unavailable.'};if($DryRun){Write-Plan 'would run ya pkg install'}else{& $ya.Source pkg install;if($LASTEXITCODE-ne0){throw 'ya pkg install failed.'}}}
+if($InstallYaziPlugins -and $selected.id -notcontains 'yazi'){throw '-InstallYaziPlugins requires yazi.'}
+if($selected.id -contains 'yazi'){
+    if($DryRun){Write-Plan 'would run ya pkg install'}else{
+        $ya=Get-App 'ya.exe';if(-not $ya){throw 'ya.exe is unavailable after installing Yazi.'}
+        & $ya.Source pkg install
+        if($LASTEXITCODE-ne0){throw 'ya pkg install failed.'}
+    }
+}
 Write-Ok $(if($DryRun){'Dry-run completed without mutation.'}else{'Windows Dotfiles installation completed.'})

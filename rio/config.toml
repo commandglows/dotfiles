@@ -321,6 +321,12 @@ size = 15
 #   { key = "home", with = "super | shift", bytes = [27, 91, 53, 126] }
 # ]
 
+[bindings]
+keys = [
+  { key = "left", with = "control | shift", action = "SelectPrevSplit" },
+  { key = "right", with = "control | shift", action = "SelectNextSplit" },
+]
+
 # Log level
 #
 # This property enables log level filter and file. The default level is "OFF" and the logs are not logged to a file as default.

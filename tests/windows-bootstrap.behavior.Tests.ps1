@@ -9,6 +9,12 @@ New-Item -ItemType Directory -Path $fixture -Force | Out-Null
 try {
     & $installer -DryRun -Only neovim -DotfilesDir $checkout -StateDir $state
     if (Test-Path $checkout) { throw 'dry-run created checkout' }; if (Test-Path $state) { throw 'dry-run created state' }
+    $yaziPlan = @(& $installer -DryRun -Only yazi -DotfilesDir $checkout -StateDir $state 6>&1 | Out-String)
+    if ($yaziPlan -notmatch 'would run ya pkg install') { throw 'Yazi selection did not plan plugin installation' }
+    if (Test-Path $checkout) { throw 'Yazi dry-run created checkout' }; if (Test-Path $state) { throw 'Yazi dry-run created state' }
+    $rioPlan = @(& $installer -DryRun -Only rio -DotfilesDir $checkout -StateDir $state 6>&1 | Out-String)
+    if ($rioPlan -notmatch 'would install rio at .*AppData\\Local\\rio\\config\.toml \(copy\)') { throw 'Rio selection did not plan its Windows configuration copy' }
+    if (Test-Path $checkout) { throw 'Rio dry-run created checkout' }; if (Test-Path $state) { throw 'Rio dry-run created state' }
     $codexPlan = @(& $installer -DryRun -Only codex-acp -DotfilesDir $checkout -StateDir $state 6>&1 | Out-String)
     if ($codexPlan -match 'would install .*codex-acp') {
         if ($codexPlan -notmatch '@zed-industries/codex-acp@0\.16\.0') { throw 'Codex ACP dry-run does not expose the pinned Node package' }

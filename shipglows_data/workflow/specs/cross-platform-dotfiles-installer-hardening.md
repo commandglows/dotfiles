@@ -1,10 +1,10 @@
 ---
 artifact: spec
 metadata_schema_version: "1.0"
-artifact_version: "1.0.0"
+artifact_version: "1.0.1"
 project: dotfiles
 created: "2026-08-27"
-updated: "2026-08-27"
+updated: "2026-08-31"
 status: ready
 source_skill: sg-development
 scope: cross-platform-dotfiles-installer-hardening
@@ -47,7 +47,7 @@ Out: Termux changes, production/server provisioning, credentials, execution poli
 - AC03: manifest selection/dependencies are validated natively without external parsing dependencies.
 - AC04: conflicts use centralized backups and every managed artifact has a journal proof.
 - AC05: uninstall refuses changed/unproven targets, restores backups, and leaves packages installed.
-- AC06: Windows diagnoses WinGet, preserves process PATH, retains useful switches, and runs Yazi package installation only explicitly.
+- AC06: Windows diagnoses WinGet, preserves process PATH, retains useful switches, and installs Yazi's declared packages whenever Yazi is selected; the compatibility switch remains accepted.
 - AC07: Linux rejects Windows/MSYS and Termux, uses explicit native package managers, handles root directly, and has no active remote-script pipe.
 - AC08: Yazi is modern/default; Ranger is Linux-only legacy and explicit.
 - AC09: shims contain no provisioning; runtime and development-clone roles are documented.
@@ -55,6 +55,8 @@ Out: Termux changes, production/server provisioning, credentials, execution poli
 - AC11: Windows Neovim pins Avante to exact release v0.2.3/SHA a0a1d12c51d5336167074215bc22ff7127ac240c with published Windows assets, uses upstream OS-specific builds, treats fzf-native as prerequisite-gated optional acceleration, and verifies pinned Codex ACP 0.16.0 plus its native x64/arm64 runtime.
 - AC12: the versioned Lazy lockfile is normalized to LF so Windows lockfile rewrites do not create formatting-only dirty checkout failures.
 - AC13: Windows installs and checks WinLibs GCC/CMake/Ninja plus the official Tree-sitter CLI as manifest dependencies of the Avante/ACP stack, without applying WinLibs or its probes to Linux.
+- AC14: Rio is installed with the Windows core profile and restores the versioned split-navigation key bindings without persisting a machine-specific working directory.
+- AC15: The Windows core profile installs dotfiles-owned `n` and `y` command shortcuts without relying on the ShipGlows runtime.
 
 ## Security, OWASP, ZOMBIES, and recovery
 
@@ -83,6 +85,10 @@ OWASP: command arguments are fixed or manifest-token validated; paths are quoted
 | 2026-08-27 | 106-sg-fix | inherited current model | Pinned Avante to stable v0.2.3 after main requested a prebuilt version with no matching release. | fix attempted; focused static/headless retest pending | Activate the pinned release in the operator runtime. |
 | 2026-08-27 | 103-sg-verify | inherited current model | Verified native Windows update/check, ACP executable, Avante release build/modules/config, and Telescope core; normalized the Lazy lockfile to LF. | passed; technical non-visual proof complete | Close BUG-2026-08-27-001. |
 | 2026-08-27 | 106-sg-fix | inherited current model | Persisted the WinLibs native toolchain and official Tree-sitter CLI after LazyVim's real prerequisite check identified their absence. | passed: parser, Windows behavior/static contracts, manifest validation, and Linux isolation | Keep the prerequisites under focused CI contracts. |
+| 2026-08-31 | 106-sg-fix | inherited current model | Made Yazi plugin installation automatic whenever the Windows installer selects Yazi. | passed: regression-first dry-run, PowerShell parser, and Windows static contract | Verify and close BUG-2026-08-31-001. |
+| 2026-08-31 | 103-sg-verify | inherited current model | Independently verified automatic Yazi package planning and read-only installer invariants. | passed: parser, behavior, static contract, and non-mutating check | BUG-2026-08-31-001 closed. |
+| 2026-08-31 | direct bounded update | inherited current model | Added Rio to the Windows core manifest and captured the operator's split-navigation shortcuts without the local working directory. | passed: TOML parse, Windows dry-run behavior, and static manifest contract | Keep Rio covered by Windows installer regression tests. |
+| 2026-08-31 | direct bounded update | inherited current model | Made the Windows core profile own both `n` and `y` shortcuts through the shared dotfiles bin path. | passed: Windows behavior/static contracts, runtime layout, and direct `n.cmd` smoke | Keep terminal shortcuts covered by installer contracts. |
 
 ## Current chantier flow
 

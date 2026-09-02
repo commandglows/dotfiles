@@ -6,7 +6,11 @@ rg -n 'status.*--porcelain|remote.*get-url.*origin|--ff-only|never resets or sta
 rg -n 'journal\.tsv|backups|REFUSED changed target|Packages were intentionally left installed' "$P" >/dev/null
 rg -n 'Import-Csv.*Delimiter|components\.tsv|Unknown or unsupported Windows component' "$P" >/dev/null
 rg -n 'Update-ProcessPath|GetEnvironmentVariable.*Path.*User|GetEnvironmentVariable.*Path.*Machine' "$P" >/dev/null
-rg -n 'InstallYaziPlugins|ya\.exe|pkg install' "$P" >/dev/null
+rg -n 'InstallYaziPlugins|ya\.exe|pkg install|selected\.id -contains .yazi.' "$P" >/dev/null
+rg -n '^neovim-shortcut\tdotfiles\twindows\tcore.*\tbin\t-\t\$\{HOME\}/\.dotfiles/bin\tnone\tpath.*\tn\.cmd\t-' "$ROOT_DIR/dotfiles/components.tsv" >/dev/null
+rg -n 'where nvim\.exe|nvim\.exe %\*' "$ROOT_DIR/bin/n.cmd" >/dev/null
+rg -n '^rio\tdotfiles\twindows\tcore.*raphamorim\.rio\trio/config\.toml\t-\t\$\{LOCALAPPDATA\}/rio/config\.toml\tnone\tcopy.*rio\|rio\.exe' "$ROOT_DIR/dotfiles/components.tsv" >/dev/null
+rg -n 'SelectPrevSplit|SelectNextSplit|control \| shift' "$ROOT_DIR/rio/config.toml" >/dev/null
 rg -n "@zed-industries/codex-acp@0\.16\.0|codex-acp-win32-\$architecture|pnpm\.cmd|npm\.cmd|--include=optional|--config\.optional=true" "$P" >/dev/null
 rg -n 'Find-CodexAcpNativeBinary|Test-CodexAcpRuntime|Node reported success.*native' "$P" >/dev/null
 rg -n 'Test-WinGetConvergedExitCode.*-1978335189|already at the latest applicable WinGet version' "$P" >/dev/null

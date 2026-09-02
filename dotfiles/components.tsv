@@ -1,5 +1,6 @@
 id	owner	platforms	profile	deps	apt_package	dnf_package	pacman_package	zypper_package	brew_package	winget_package	config_source	target_linux	target_windows	mode_linux	mode_windows	conflict_policy	privilege	health_probe	node_package
 neovim	dotfiles	windows,linux	core	-	neovim	neovim	neovim	neovim	neovim	Neovim.Neovim	nvim/MyNeovim	${XDG_CONFIG_HOME}/nvim	${LOCALAPPDATA}/nvim	link	junction	backup	user-or-package-manager	nvim|nvim.exe	-
+neovim-shortcut	dotfiles	windows	core	-	-	-	-	-	-	-	bin	-	${HOME}/.dotfiles/bin	none	path	backup	user	n.cmd	-
 starship	dotfiles	windows,linux	core	-	starship	starship	starship	starship	starship	Starship.Starship	starship/starship.toml	${XDG_CONFIG_HOME}/starship.toml	${HOME}/.config/starship.toml	link	copy	backup	user-or-package-manager	starship|starship.exe	-
 zoxide	dotfiles	windows,linux	core	-	zoxide	zoxide	zoxide	zoxide	zoxide	ajeetdsouza.zoxide	-	-	-	none	none	backup	user-or-package-manager	zoxide|zoxide.exe	-
 fzf	dotfiles	windows,linux	core	-	fzf	fzf	fzf	fzf	fzf	junegunn.fzf	-	-	-	none	none	backup	user-or-package-manager	fzf|fzf.exe	-
@@ -8,6 +9,7 @@ fd	dotfiles	windows,linux	core	-	fd-find	fd-find	fd	fd	fd	sharkdp.fd	-	-	-	none	
 bat	dotfiles	windows,linux	core	-	bat	bat	bat	bat	bat	sharkdp.bat	-	-	-	none	none	backup	user-or-package-manager	bat|batcat|bat.exe	-
 yazi	dotfiles	windows,linux	core	-	-	-	yazi	-	yazi	sxyazi.yazi	yazi	${XDG_CONFIG_HOME}/yazi	${APPDATA}/yazi/config	link	junction	backup	user-or-package-manager	yazi|yazi.exe	-
 yazi-shortcut	dotfiles	windows	core	yazi	-	-	-	-	-	-	bin	-	${HOME}/.dotfiles/bin	none	path	backup	user	y.cmd	-
+rio	dotfiles	windows	core	-	-	-	-	-	-	raphamorim.rio	rio/config.toml	-	${LOCALAPPDATA}/rio/config.toml	none	copy	backup	user-or-package-manager	rio|rio.exe	-
 powershell-config	dotfiles	windows	core	-	-	-	-	-	-	-	powershell/ShipGlows.Profile.ps1	-	${HOME}/.config/shipglows/profile.ps1	none	copy	backup	user	-	-
 windows-native-toolchain	dotfiles	windows	core	-	-	-	-	-	-	BrechtSanders.WinLibs.POSIX.UCRT	-	-	-	none	none	backup	user-or-package-manager	gcc.exe&cmake.exe&ninja.exe	-
 tree-sitter-cli	dotfiles	windows	core	-	-	-	-	-	-	tree-sitter.tree-sitter-cli	-	-	-	none	none	backup	user-or-package-manager	tree-sitter.exe	-
