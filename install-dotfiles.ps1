@@ -425,6 +425,8 @@ if($Check){$failed=$false;foreach($row in $selected){if(-not(Test-Component $row
 foreach($row in $selected){Install-Package $row};foreach($row in $selected){Install-Artifact $row}
 if($InstallYaziPlugins -and $selected.id -notcontains 'yazi'){throw '-InstallYaziPlugins requires yazi.'}
 if($selected.id -contains 'yazi'){
+    $fileexe=@("C:\Program Files\Git\usr\bin\file.exe",(Join-Path $env:ProgramFiles 'Git\usr\bin\file.exe'))|Where-Object{Test-Path -LiteralPath $_}|Select-Object -First 1
+    if($fileexe -and ([Environment]::GetEnvironmentVariable('YAZI_FILE_ONE','User') -ine $fileexe)){if($DryRun){Write-Plan "would set YAZI_FILE_ONE=$fileexe"}else{[Environment]::SetEnvironmentVariable('YAZI_FILE_ONE',$fileexe,'User')}}
     if($DryRun){Write-Plan 'would run ya pkg install'}else{
         $ya=Get-App 'ya.exe';if(-not $ya){throw 'ya.exe is unavailable after installing Yazi.'}
         & $ya.Source pkg install
