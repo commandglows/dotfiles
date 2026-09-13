@@ -42,6 +42,16 @@ if [ "$before" != "$after" ] || rg -q 'DRY-RUN: would clone' "$TMP/delegated-dry
   exit 1
 fi
 
+printf 'dotfiles: Piped bootstrap delegate preview.\n'
+if ! bash < "$ROOT_DIR/install-dotfiles.sh" --dry-run --only neovim >"$TMP/piped-dry.out" 2>&1; then
+  cat "$TMP/piped-dry.out" >&2
+  exit 1
+fi
+if rg -q 'Bad substitution|not found' "$TMP/piped-dry.out"; then
+  cat "$TMP/piped-dry.out" >&2
+  exit 1
+fi
+
 printf 'dotfiles: Non-git checkout guard.\n'
 rm -rf "$DOTFILES_DIR"
 mkdir -p "$HOME"

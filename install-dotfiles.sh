@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_URL="${DOTFILES_REPO_URL:-https://github.com/commandglows/dotfiles.git}"
 BRANCH="${DOTFILES_BRANCH:-master}"
 DOTFILES_DIR="${DOTFILES_DIR:-${HOME:-/tmp}/.dotfiles}"
@@ -71,4 +70,4 @@ export DOTFILES_DIR
 export DOTFILES_REPO_URL="$REPO_URL"
 export DOTFILES_BRANCH="$BRANCH"
 
-exec "$SCRIPT_DIR/dotfiles/install-dotfiles.sh" "$@"
+exec "$DOTFILES_DIR/dotfiles/install-dotfiles.sh" "$@"
