@@ -150,6 +150,8 @@ $begin
 export PATH="\$HOME/.local/bin:\$PATH"
 command -v starship >/dev/null 2>&1 && eval "\$(starship init bash)"
 command -v zoxide >/dev/null 2>&1 && eval "\$(zoxide init bash)"
+[ -f "\$HOME/.dotfiles/nvim/shell-integration.sh" ] && source "\$HOME/.dotfiles/nvim/shell-integration.sh"
+alias r='ranger'
 $end
 EOF
   mv -- "$tmp" "$target"; append_journal "$component" "$target" builtin:shell-block shell-block '' "marker:$component"
