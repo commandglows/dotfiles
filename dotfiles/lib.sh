@@ -158,7 +158,19 @@ EOF
 detect_package_manager() { local m; for m in apt-get dnf pacman zypper brew; do command -v "$m" >/dev/null 2>&1 && { printf '%s' "$m"; return; }; done; return 1; }
 package_column() { case "$1" in apt-get)printf 6;;dnf)printf 7;;pacman)printf 8;;zypper)printf 9;;brew)printf 10;;esac; }
 run_privileged() { if [ "$(id -u)" -eq 0 ]; then "$@"; elif command -v sudo >/dev/null 2>&1; then sudo -- "$@"; else die "package installation requires root or sudo: $*"; fi; }
-probe_ok() { local probes="$1" p old="$IFS"; IFS='|'; for p in $probes; do command -v "$p" >/dev/null 2>&1 && { IFS="$old"; return 0; }; done; IFS="$old"; return 1; }
+probe_ok() {
+  local probes="$1" p path old="$IFS"
+  IFS='|'; for p in $probes; do
+    IFS="$old"
+    if command -v "$p" >/dev/null 2>&1; then
+      path="$(command -v "$p" 2>/dev/null)"
+      case "$path" in /mnt/*|*.exe) IFS='|'; continue;; esac
+      return 0
+    fi
+    IFS='|'
+  done
+  IFS="$old"; return 1
+}
 
 install_packages() {
   local manager column packages='' missing='' row package probe id
