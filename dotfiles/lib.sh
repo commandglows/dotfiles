@@ -175,13 +175,17 @@ probe_ok() {
 }
 
 install_packages() {
-  local manager column packages='' missing='' row package probe id
+  local manager column packages='' missing='' row package probe id src
   manager="$(detect_package_manager)" || die 'no supported package manager found (apt-get, dnf, pacman, zypper, brew)'; column="$(package_column "$manager")"
   while IFS= read -r row; do
     id="$(printf '%s\n' "$row"|cut -f1)"; package="$(printf '%s\n' "$row"|cut -f"$column")"; probe="$(printf '%s\n' "$row"|cut -f19)"
     [ -n "$probe" ] && [ "$probe" != '-' ] || continue
     if [ "$DOTFILES_UPDATE" != true ] && probe_ok "$probe"; then continue; fi
-    if [ -z "$package" ] || [ "$package" = '-' ]; then missing="${missing:+$missing, }$id ($probe)"; else packages="${packages:+$packages }$package"; fi
+    if [ -z "$package" ] || [ "$package" = '-' ]; then
+      src="$(printf '%s\n' "$row"|cut -f12)"
+      if [ -n "$src" ] && [ "$src" != '-' ]; then continue; fi
+      missing="${missing:+$missing, }$id ($probe)"
+    else packages="${packages:+$packages }$package"; fi
   done < <(selected_rows)
   [ -z "$missing" ] || die "dependencies have no $manager mapping: $missing. Install them explicitly or choose supported components."
   [ -n "$packages" ] || return 0

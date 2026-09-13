@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+if command -v fdfind >/dev/null 2>&1; then exec fdfind "$@"; fi
+exec fd "$@"

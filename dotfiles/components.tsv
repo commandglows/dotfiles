@@ -6,7 +6,10 @@ zoxide	dotfiles	windows,linux	core	-	zoxide	zoxide	zoxide	zoxide	zoxide	ajeetdso
 fzf	dotfiles	windows,linux	core	-	fzf	fzf	fzf	fzf	fzf	junegunn.fzf	-	-	-	none	none	backup	user-or-package-manager	fzf|fzf.exe	-
 ripgrep	dotfiles	windows,linux	core	-	ripgrep	ripgrep	ripgrep	ripgrep	ripgrep	BurntSushi.ripgrep.MSVC	-	-	-	none	none	backup	user-or-package-manager	rg|rg.exe	-
 fd	dotfiles	windows,linux	core	-	fd-find	fd-find	fd	fd	fd	sharkdp.fd	-	-	-	none	none	backup	user-or-package-manager	fd|fdfind|fd.exe	-
+fd-shim	dotfiles	linux	core	fd	-	-	-	-	-	-	bin/fd	${HOME}/.local/bin/fd	-	copy	none	backup	user	fd|fd.exe	-
 bat	dotfiles	windows,linux	core	-	bat	bat	bat	bat	bat	sharkdp.bat	-	-	-	none	none	backup	user-or-package-manager	bat|batcat|bat.exe	-
+linux-toolchain	dotfiles	linux	core	-	build-essential	gcc-c++ make	base-devel	gcc-c++ make	-	-	-	-	-	none	none	backup	user-or-package-manager	gcc|cc|make	-
+bat-shim	dotfiles	linux	core	bat	-	-	-	-	-	-	bin/bat	${HOME}/.local/bin/bat	-	copy	none	backup	user	bat|bat.exe	-
 yazi	dotfiles	windows	core	-	-	-	yazi	-	yazi	sxyazi.yazi	yazi	${XDG_CONFIG_HOME}/yazi	${APPDATA}/yazi/config	link	junction	backup	user-or-package-manager	yazi|yazi.exe	-
 yazi-shortcut	dotfiles	windows	core	yazi	-	-	-	-	-	-	bin	-	${HOME}/.dotfiles/bin	none	path	backup	user	y.cmd	-
 rio	dotfiles	windows	core	-	-	-	-	-	-	raphamorim.rio	rio/config.toml	-	${LOCALAPPDATA}/rio/config.toml	none	copy	backup	user-or-package-manager	rio|rio.exe	-
