@@ -5,6 +5,7 @@ info() { printf 'dotfiles: %s\n' "$*"; }
 plan() { printf 'dotfiles: DRY-RUN: %s\n' "$*"; }
 
 normalize_repo_url() { printf '%s' "$1" | tr '\\' '/' | sed -E 's#\.git/?$##;s#/$##' | tr '[:upper:]' '[:lower:]'; }
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
 
 require_linux_host() {
   case "$(uname -s)" in

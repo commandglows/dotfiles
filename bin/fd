@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 if command -v fdfind >/dev/null 2>&1; then exec fdfind "$@"; fi
-exec fd "$@"
+if [ -x /usr/bin/fd ]; then exec /usr/bin/fd "$@"; fi
+if [ -x /usr/local/bin/fd ]; then exec /usr/local/bin/fd "$@"; fi
+echo 'fd: no backend executable found' >&2; exit 127
