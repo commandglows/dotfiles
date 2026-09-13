@@ -390,6 +390,11 @@ function Test-Component([object]$Row) {
         Write-Host "MISSING command: $($Row.health_probe) [$($Row.id)]"; $healthy=$false
     }
     if ($Row.mode_windows -and $Row.mode_windows -notin @('none','path')) { $target=Resolve-TokenPath $Row.target_windows; if (-not (Test-Path -LiteralPath $target)) { Write-Host "MISSING config: $target [$($Row.id)]"; $healthy=$false } }
+    if ($Row.id -eq 'yazi' -and $Row.mode_windows -eq 'junction') {
+        $target = Resolve-TokenPath $Row.target_windows
+        $pluginMain = Join-Path $target 'plugins\git.yazi\main.lua'
+        if (-not (Test-Path -LiteralPath $pluginMain)) { Write-Host "MISSING yazi plugin: $pluginMain [$($Row.id)]"; $healthy=$false }
+    }
     $healthy
 }
 

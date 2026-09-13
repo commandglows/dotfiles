@@ -49,5 +49,5 @@ ehthumbs.db
 nvim/.config/nvim/plugin/
 nvim/.config/nvim/spell/*.spl
 general/.config/zsh/plugins/
-yazi/.config/yazi/plugins/
+yazi/plugins/
 accels.scm
