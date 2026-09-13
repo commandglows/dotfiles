@@ -371,14 +371,10 @@ sed -i '/# Termux aliases/,/# END Termux aliases/d' "$BASHRC" 2>/dev/null
 cat >> "$BASHRC" << 'EOF'
 
 # Termux aliases
-alias re='source "$HOME/.bashrc" && echo "✓ Shell rechargé!"'
-alias reload='source "$HOME/.bashrc" && echo "✓ Shell rechargé!"'
 alias i='bash ~/.dotfiles/dotfiles/termux.sh'
 alias dot='~/.dotfiles/dotfiles/termux.sh'
 alias dotfiles='~/.dotfiles/dotfiles/termux.sh'
 alias cls='clear'
-alias ..='cd ..'
-alias ...='cd ../..'
 
 # Git shortcuts
 alias gs='git status'
@@ -386,7 +382,6 @@ alias ga='git add .'
 gc() { git commit -m "${1:-up}"; }
 function gp { if [ -n "$(git status --porcelain)" ]; then git add -A && git commit -m "${1:-up}"; fi; git push; }
 alias gl='git pull'
-alias gd='git diff'
 
 # Termux specific
 alias termux-wake='termux-wake-lock'

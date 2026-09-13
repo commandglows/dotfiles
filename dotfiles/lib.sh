@@ -152,7 +152,13 @@ export PATH="\$HOME/.local/bin:\$PATH"
 command -v starship >/dev/null 2>&1 && eval "\$(starship init bash)"
 command -v zoxide >/dev/null 2>&1 && eval "\$(zoxide init bash)"
 [ -f "\$HOME/.dotfiles/nvim/shell-integration.sh" ] && source "\$HOME/.dotfiles/nvim/shell-integration.sh"
-alias r='ranger'
+alias ds='\$HOME/.dotfiles/dotfiles/doppler-setup.sh'
+alias ch='clear; tmux clear-history 2>/dev/null; source "\$HOME/.bashrc" && echo "✓ Shell reloaded"'
+alias re='source "\$HOME/.bashrc" && echo "✓ Shell reloaded"'
+alias cls='clear'
+alias gs='git status'
+alias ga='git add .'
+gc() { git commit -m "\${1:-up}"; }
 $end
 EOF
   mv -- "$tmp" "$target"; append_journal "$component" "$target" builtin:shell-block shell-block '' "marker:$component"

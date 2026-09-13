@@ -10,8 +10,6 @@ alias nvim-switch="$DOTFILES_NVIM_ALIASES_DIR/switch-config.sh"
 alias nv-switch="$DOTFILES_NVIM_ALIASES_DIR/switch-config.sh"
 
 # Quick access to different configs using NVIM_APPNAME
-alias n="nvim"
-alias nv="nvim"
 alias nv3="NVIM_APPNAME=nvim3 nvim"
 alias nv6="NVIM_APPNAME=nvim6 nvim"
 alias nv11="NVIM_APPNAME=nvim11 nvim"
@@ -79,7 +77,3 @@ elif [[ -n "${ZSH_VERSION:-}" ]]; then
     autoload -Uz add-zsh-hook 2>/dev/null
     add-zsh-hook precmd _git_auto_fetch 2>/dev/null
 fi
-
-# Manual fetch alias (with visible output)
-alias gf='git fetch --all --prune && echo "✓ Fetched all remotes"'
-alias gfa='git fetch --all --prune && echo "✓ Fetched all remotes"'
