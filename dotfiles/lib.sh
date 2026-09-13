@@ -84,11 +84,11 @@ select_components() {
   requested="$DOTFILES_ONLY"; if [ -z "$requested" ]; then requested="$(platform_rows|awk -F '\t' '$4=="core"{printf "%s%s",s,$1;s=","}')"; fi
   [ -n "$requested" ] || die 'no Linux components selected'; SELECTED_IDS=""
   add_component() {
-    id="$1"; case ",$SELECTED_IDS," in *",$id,"*) return;; esac
-    row="$(platform_rows|awk -F '\t' -v id="$id" '$1==id{print;found=1}END{if(!found)exit 1}')" || die "unknown or unsupported Linux component: $id"
+    local cid="$1"; case ",$SELECTED_IDS," in *",$cid,"*) return;; esac
+    row="$(platform_rows|awk -F '\t' -v id="$cid" '$1==id{print;found=1}END{if(!found)exit 1}')" || die "unknown or unsupported Linux component: $cid"
     deps="$(printf '%s\n' "$row"|cut -f5)"
     if [ -n "$deps" ] && [ "$deps" != '-' ]; then old_ifs="$IFS"; IFS=','; for dep in $deps; do add_component "$dep"; done; IFS="$old_ifs"; fi
-    SELECTED_IDS="${SELECTED_IDS:+$SELECTED_IDS,}$id"
+    SELECTED_IDS="${SELECTED_IDS:+$SELECTED_IDS,}$cid"
   }
   old_ifs="$IFS"; IFS=','; for id in $requested; do [ -n "$id" ] || die 'empty component in --only'; add_component "$id"; done; IFS="$old_ifs"; export SELECTED_IDS
 }
