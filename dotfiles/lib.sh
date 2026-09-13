@@ -182,7 +182,7 @@ install_packages() {
     if [ -z "$package" ] || [ "$package" = '-' ]; then missing="${missing:+$missing, }$id ($probe)"; else packages="${packages:+$packages }$package"; fi
   done < <(selected_rows)
   [ -z "$missing" ] || die "dependencies have no $manager mapping: $missing. Install them explicitly or choose supported components."
-  [ -n "$packages" ] || return
+  [ -n "$packages" ] || return 0
   if [ "$DOTFILES_DRY_RUN" = true ]; then plan "would use $manager for: $packages"; return; fi
   case "$packages" in *[!a-zA-Z0-9._+\ -]*) die 'unsafe package token in manifest';; esac
   # shellcheck disable=SC2086
