@@ -56,26 +56,28 @@ L'agent par défaut est `claude --permission-mode bypassPermissions`. Plus large
 
 ### Code Preview (agent-agnostic)
 
-Diff live/auto des modifications proposées par les agents CLI (Claude Code, OpenCode, Codex CLI, Copilot CLI), indépendamment de l'agent utilisé. Layout : onglet séparé. `:CodePreviewCloseDiff` ferme le diff, `:CodePreviewStatus` affiche l'état.
+Diff live/auto des modifications proposées par les agents CLI (Claude Code, Codex CLI), indépendamment de l'agent utilisé. Layout : onglet séparé. `:CodePreviewCloseDiff` ferme le diff, `:CodePreviewStatus` affiche l'état.
+
+> ⚠️ **OpenCode : ne pas installer le hook.** Le plugin `.opencode/plugins/` (code-preview) fait planter le serveur opencode au démarrage (« Unexpected server error ») sur le fork installé (`opencode` 1.18.30, anomalycocompatible) — l'API de plugin y est incompatible. Ce hook a été retiré du workspace. Ne pas lancer `:CodePreviewInstallOpenCodeHooks`.
 
 Installation par projet (le hook est écrit dans le répertoire de travail courant de Nvim) :
 
 ```vim
 :CodePreviewInstallClaudeCodeHooks   " -> .claude/settings.local.json
-:CodePreviewInstallOpenCodeHooks     " -> .opencode/plugins/
 :CodePreviewInstallCodexCliHooks     " -> .codex/hooks.json
 ```
 
 Prérequis : `jq` dans le PATH (installer via `winget install --id jqlang.jq`). Redémarrer les CLI après l'installation des hooks.
 
-**Mode YOLO** : les permissions opencode restent `"permission": "allow"` (cf. `C:\Users\Diane\.config\opencode\opencode.json`) et aucun `approval_policy` n'est configuré pour Codex. En conséquence, OpenCode et Codex appliquent leurs modifications sans bloquer sur une décision : la préview n'apparaît pas pour ces deux agents. La préview reste effective pour **Claude Code** (hooks + `--permission-mode` qui bloque), le diff affichant les changements avant leur application manuelle via `:CodePreviewApplyChanges`.
+**Mode YOLO** : les permissions opencode restent `"permission": "allow"` (cf. `C:\Users\Diane\.config\opencode\opencode.json`) et aucun `approval_policy` n'est configuré pour Codex. En conséquence, Codex applique ses modifications sans bloquer sur une décision : la préview n'apparaît pas pour Codex. La préview reste effective pour **Claude Code** (hooks + `--permission-mode` qui bloque), le diff affichant les changements avant leur application manuelle via `:CodePreviewApplyChanges`.
 
 ## Migration / changement de machine
 
-- Les hooks code-preview sont **par projet** : relancer les 3 commandes `:CodePreviewInstall*Hooks` dans chaque projet, puis redémarrer les CLI.
+- Les hooks code-preview sont **par projet** : relancer les 2 commandes `:CodePreviewInstallClaudeCodeHooks` / `:CodePreviewInstallCodexCliHooks` dans chaque projet, puis redémarrer les CLI.
 - `jq` doit être présent dans le PATH (winget).
 - `install-dotfiles.ps1` pointe par défaut vers `~/.dotfiles` : le junction `%LOCALAPPDATA%\nvim` ramène vers `C:\Users\Diane\ShipGlows\dotfiles\nvim\MyNeovim`. Après une réinstallation dotfiles, vérifier que le junction regarde la copie de travail (ShipGlows) et non `.dotfiles`.
-- `.codex/hooks.json`, `.opencode/plugins/` et les hooks dans `.claude/settings.local.json` sont des fichiers du dépôt (racine) : présents au clone.
+- `.codex/hooks.json` et les hooks dans `.claude/settings.local.json` sont des fichiers du dépôt (racine) : présents au clone.
+- **Ne pas réinstaller le hook opencode** (cf. avertissement ci-dessus) : la présence d'un `.opencode/` avec plugin casse le lancement d'opencode dans le projet.
 - Les hooks codock/code-preview ne couvrent pas Gemini CLI ni Crush.
 
 ## Comment choisir
