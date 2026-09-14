@@ -2,30 +2,41 @@ onboarding = false
 
 [ui]
 status_indicators = "symbols"
+window_title = "."
+tab_bar_right_separator = " | "
+tab_bar_right = [
+  { type = "command", command = "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Diane\\ShipGlows\\dotfiles\\herdr\\status.ps1\"", interval_seconds = 5, timeout_seconds = 3 },
+]
 
 [ui.toast]
 delivery = "system"
 
 [keys]
 prefix = "ctrl+q"
+settings = "prefix+p"
 workspace_picker = "prefix+s"
-next_workspace = "prefix+down"
-previous_workspace = "prefix+up"
+next_workspace = "prefix+shift+down"
+previous_workspace = "prefix+shift+up"
 next_tab = "prefix+tab"
 previous_tab = "prefix+shift+tab"
 cycle_pane_next = ""
 cycle_pane_previous = ""
-focus_pane_left = "prefix+h"
-focus_pane_down = "prefix+j"
-focus_pane_up = "prefix+k"
-focus_pane_right = "prefix+l"
+focus_pane_left = "prefix+left"
+focus_pane_down = "prefix+down"
+focus_pane_up = "prefix+up"
+focus_pane_right = "prefix+right"
 close_pane = "prefix+x"
 close_tab = "prefix+w"
+new_tab = "prefix+n"
 close_workspace = "prefix+shift+w"
 rename_pane = "prefix+r"
 rename_tab = "prefix+shift+r"
 rename_workspace = "prefix+alt+r"
 resize_mode = ""
+resize_pane_left = "shift+left"
+resize_pane_down = "shift+down"
+resize_pane_up = "shift+up"
+resize_pane_right = "shift+right"
 reload_config = ""
 
 [[keys.command]]

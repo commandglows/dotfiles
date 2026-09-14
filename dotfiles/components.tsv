@@ -21,3 +21,4 @@ shell-init	dotfiles	linux	core	starship,zoxide	-	-	-	-	-	-	builtin:shell-block	$
 wezterm	dotfiles	windows,linux	optional	-	-	-	wezterm	-	wezterm	wez.wezterm.nightly	wezterm/wezterm.lua	${XDG_CONFIG_HOME}/wezterm/wezterm.lua	${HOME}/.config/wezterm/wezterm.lua	copy	copy	backup	user-or-package-manager	wezterm|wezterm.exe	-
 ghostty	dotfiles	linux	optional	-	-	-	ghostty	-	ghostty	-	ghostty/config	${XDG_CONFIG_HOME}/ghostty/config	-	copy	none	backup	user-or-package-manager	ghostty	-
 ranger	dotfiles	linux	core	-	ranger	ranger	ranger	ranger	ranger	-	ranger	${XDG_CONFIG_HOME}/ranger	-	link	none	backup	user-or-package-manager	ranger	-
+herdr-config	dotfiles	windows,linux	core	-	-	-	-	-	-	-	herdr/config.toml	${XDG_CONFIG_HOME}/herdr/config.toml	${APPDATA}/herdr/config.toml	copy	copy	backup	user	-	-
