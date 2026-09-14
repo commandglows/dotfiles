@@ -43,9 +43,45 @@ Pour l'installation, les vérifications sûres, les erreurs à éviter et la pro
 - `Espace a g d` : demander un fix des diagnostics du buffer courant
 - `Espace a g /` : ouvrir le picker des slash commands Gemini
 
+### Codock
+
+Dock nvim pour les agents en CLI (par défaut Claude Code), avec popup d'actions custom.
+
+- `Espace C C` : toggle du dock
+- `Espace C A` : popup des actions (5 actions custom en français)
+- `Espace C Y` : yank la position du fichier (rejoignable par l'agent)
+- `Espace C P` : coller la position yankée (jump à un fichier/ligne/colonne)
+
+L'agent par défaut est `claude --permission-mode bypassPermissions`. Plus large d'action qu'un simple terminal car il expose le fichier courant, le buffer et les diagnostics à l'agent.
+
+### Code Preview (agent-agnostic)
+
+Diff live/auto des modifications proposées par les agents CLI (Claude Code, OpenCode, Codex CLI, Copilot CLI), indépendamment de l'agent utilisé. Layout : onglet séparé. `:CodePreviewCloseDiff` ferme le diff, `:CodePreviewStatus` affiche l'état.
+
+Installation par projet (le hook est écrit dans le répertoire de travail courant de Nvim) :
+
+```vim
+:CodePreviewInstallClaudeCodeHooks   " -> .claude/settings.local.json
+:CodePreviewInstallOpenCodeHooks     " -> .opencode/plugins/
+:CodePreviewInstallCodexCliHooks     " -> .codex/hooks.json
+```
+
+Prérequis : `jq` dans le PATH (installer via `winget install --id jqlang.jq`). Redémarrer les CLI après l'installation des hooks.
+
+**Mode YOLO** : les permissions opencode restent `"permission": "allow"` (cf. `C:\Users\Diane\.config\opencode\opencode.json`) et aucun `approval_policy` n'est configuré pour Codex. En conséquence, OpenCode et Codex appliquent leurs modifications sans bloquer sur une décision : la préview n'apparaît pas pour ces deux agents. La préview reste effective pour **Claude Code** (hooks + `--permission-mode` qui bloque), le diff affichant les changements avant leur application manuelle via `:CodePreviewApplyChanges`.
+
+## Migration / changement de machine
+
+- Les hooks code-preview sont **par projet** : relancer les 3 commandes `:CodePreviewInstall*Hooks` dans chaque projet, puis redémarrer les CLI.
+- `jq` doit être présent dans le PATH (winget).
+- `install-dotfiles.ps1` pointe par défaut vers `~/.dotfiles` : le junction `%LOCALAPPDATA%\nvim` ramène vers `C:\Users\Diane\ShipGlows\dotfiles\nvim\MyNeovim`. Après une réinstallation dotfiles, vérifier que le junction regarde la copie de travail (ShipGlows) et non `.dotfiles`.
+- `.codex/hooks.json`, `.opencode/plugins/` et les hooks dans `.claude/settings.local.json` sont des fichiers du dépôt (racine) : présents au clone.
+- Les hooks codock/code-preview ne couvrent pas Gemini CLI ni Crush.
+
 ## Comment choisir
 
 - Prenez **Copilot Chat** si vous voulez une intégration NeoVim plus poussée et une UX plus opinionated.
 - Prenez **Avante Codex** si vous voulez utiliser Codex dans Avante via votre abonnement ChatGPT/Codex plutot que la facturation API OpenAI.
 - Prenez **Gemini CLI** si vous voulez un mode agent plus direct, proche du CLI officiel.
 - Gardez **Claude Code** pour les sessions plus longues ou les diffs plus ambitieux.
+- Prenez **Code Preview** pour voir/approuver les diffs de n'importe quel agent CLI sans dépendre d'un seul éditeur.
