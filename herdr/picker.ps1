@@ -25,7 +25,7 @@ function New-TabPanes {
     if ($panes.Count -eq 0) {
         $bottom = Invoke-Herdr @("pane", "split", $PaneId, "--direction", "down", "--ratio", "0.8", "--no-focus")
         $nvim = Invoke-Herdr @("pane", "split", $PaneId, "--direction", "right", "--ratio", "0.5", "--no-focus")
-        [void](Invoke-Herdr @("pane", "run", $PaneId, "crush"))
+        [void](Invoke-Herdr @("pane", "run", $PaneId, "C:\\Users\\Diane\\ShipGlows\\dotfiles\\herdr\\crush-herdr.ps1"))
         Start-Sleep -Milliseconds 300
         [void](Invoke-Herdr @("pane", "run", $nvim.result.pane.pane_id, "nvim"))
         return

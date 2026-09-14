@@ -31,7 +31,7 @@ $nvim = Invoke-Herdr @("pane", "split", $rootPane, "--direction", "right", "--ra
 
 if (-not $NoCrush) {
     Start-Sleep -Milliseconds 300
-    [void](Invoke-Herdr @("pane", "run", $rootPane, "crush"))
+    [void](Invoke-Herdr @("pane", "run", $rootPane, "C:\\Users\\Diane\\ShipGlows\\dotfiles\\herdr\\crush-herdr.ps1"))
 }
 Start-Sleep -Milliseconds 300
 [void](Invoke-Herdr @("pane", "run", $nvim.result.pane.pane_id, "nvim"))
