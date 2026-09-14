@@ -1,0 +1,23 @@
+onboarding = false
+
+[ui]
+status_indicators = "symbols"
+
+[ui.toast]
+delivery = "system"
+
+[keys]
+
+[[keys.command]]
+key = "prefix+alt+p"
+type = "popup"
+description = "Project picker: opens a project as a Herdr space (crush + nvim + terminal layout)"
+command = "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Diane\\ShipGlows\\dotfiles\\herdr\\picker.ps1\""
+width = "70%"
+height = "60%"
+
+[[keys.command]]
+key = "prefix+alt+t"
+type = "shell"
+description = "New tab with the same layout (crush + nvim + terminal) in the current project"
+command = "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\Diane\\ShipGlows\\dotfiles\\herdr\\new-layout-tab.ps1\""
