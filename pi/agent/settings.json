@@ -1,0 +1,16 @@
+{
+  "lastChangelogVersion": "0.85.1",
+  "defaultProvider": "cerebras",
+  "defaultModel": "gpt-oss-120b",
+  "defaultThinkingLevel": "low",
+  "editorPaddingX": 1,
+  "quietStartup": true,
+  "theme": "guts",
+  "autocompleteMaxVisible": 10,
+  "hideThinkingBlock": false,
+  "packages": [
+    "npm:pi-vim-flash",
+    "https://github.com/dmmulroy/pi-web-tools",
+    "git:github.com/dmmulroy/pi-mcp"
+  ]
+}

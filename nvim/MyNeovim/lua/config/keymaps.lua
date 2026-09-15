@@ -21,7 +21,8 @@ vim.keymap.del("n", "<leader>-")
 vim.keymap.del("n", "<leader>|")
 vim.keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split Window Below", remap = true })
 vim.keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split Window Right", remap = true })
-vim.keymap.set("n", "<leader>uw", ":set wrap!<CR>", { desc = "Toggle wrap" })
+vim.keymap.set("n", "<leader>ww", "<C-W>w", { desc = "Cycle Windows", remap = true })
+vim.keymap.set("n", "<leader>wW", "<C-W>p", { desc = "Other Window", remap = true })
 vim.keymap.set("n", "<leader>r", "<cmd>checktime<cr>", { desc = "Reload changed files" })
 vim.keymap.set("n", "<leader>R", function()
   local init = vim.fn.stdpath("config") .. "/init.lua"
@@ -57,6 +58,9 @@ vim.keymap.set("n", "<leader>bb", switch_to_other_buffer, { desc = "Switch to Ot
 vim.keymap.del("n", "<leader>`")
 vim.keymap.set("n", "<Tab>", "<cmd>bnext<cr>", { desc = "Buffer suivant", silent = true })
 vim.keymap.set("n", "<S-Tab>", "<cmd>bprevious<cr>", { desc = "Buffer precedent", silent = true })
+vim.keymap.set("i", "<S-Tab>", "<C-d>", { desc = "Desindenter" })
+vim.keymap.set("i", "<C-t>", "<Nop>", { desc = "Desactiver indentation" })
+vim.keymap.set("i", "<C-d>", "<Nop>", { desc = "Desactiver desindentation" })
 
 local cheat_sheets = {
   {
@@ -118,6 +122,11 @@ end
 vim.keymap.set("n", "<leader>H", choose_cheat_sheet, { desc = "Cheat Sheet" })
 
 require("shipglows").setup()
+
+local copy_current_path = require("shipglows.path").current_buffer
+vim.api.nvim_create_user_command("CopyPath", copy_current_path, { desc = "Copier le chemin absolu" })
+vim.keymap.set("n", "<leader>yp", copy_current_path, { desc = "Copier le chemin du buffer" })
+vim.keymap.set("n", "Y", copy_current_path, { desc = "Copier le chemin du buffer" })
 
 pcall(vim.keymap.del, "n", "<leader>L")
 

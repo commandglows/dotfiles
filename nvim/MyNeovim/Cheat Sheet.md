@@ -202,6 +202,14 @@ Règle importante : les titres `H1` (`#`) restent toujours ouverts.
 
 ## Explorer
 
+### Copier un chemin
+
+- `Y` : copie le chemin absolu du buffer courant.
+- Dans un explorateur Snacks ou Neo-tree, `Y` copie le chemin absolu du fichier ou dossier sous le curseur.
+- `<leader>yp` et `:CopyPath` sont des alias pour le buffer courant.
+
+Ce remplacement désactive volontairement le raccourci Vim natif `Y` (yank jusqu'à la fin de la ligne).
+
 ### NeoTree
 
 Trois portes d'entrée — attention, « root » ici n'est ni le root système (`/`) ni le project root LazyVim, c'est juste `$HOME`.

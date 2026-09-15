@@ -12,6 +12,7 @@ return {
   { "scottmckendry/cyberdream.nvim", enabled = true, lazy = true },
   { "catppuccin/nvim", name = "catppuccin", enabled = true, lazy = true },
   { "EdenEast/nightfox.nvim", enabled = true, lazy = true },
+  { "Prince-Ramani/crush.nvim", enabled = true, lazy = true },
 
   -- Main theme
   {

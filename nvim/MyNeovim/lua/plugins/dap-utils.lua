@@ -1,6 +1,6 @@
 return {
   "niuiic/dap-utils.nvim",
-  enabled = false,
+  enabled = true,
   dependencies = {
     "niuiic/core.nvim",
     "mfussenegger/nvim-dap",

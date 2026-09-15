@@ -220,6 +220,10 @@ return {
         model = "claude-3-5-sonnet-latest",
         proxy = "http://127.0.0.1:8888",
       },
+      cerebras = {
+        endpoint = "https://api.cerebras.ai/v1",
+        model = "llama3.1-70b",
+      },
     },
     acp_providers = {
       codex = {

@@ -1,7 +1,74 @@
 return {
   { "tzachar/highlight-undo.nvim", optional = true, enabled = false },
 
-  { "y3owk1n/undo-glow.nvim", optional = true, enabled = false },
+  {
+    "y3owk1n/undo-glow.nvim",
+    version = "*",
+    event = "VeryLazy",
+    keys = {
+      {
+        "u",
+        function()
+          require("undo-glow").undo()
+        end,
+        mode = "n",
+        desc = "Undo with highlight",
+      },
+      {
+        "U",
+        function()
+          require("undo-glow").redo()
+        end,
+        mode = "n",
+        desc = "Redo with highlight",
+      },
+      {
+        "p",
+        function()
+          require("undo-glow").paste_below()
+        end,
+        mode = "n",
+        desc = "Paste below with highlight",
+      },
+      {
+        "P",
+        function()
+          require("undo-glow").paste_above()
+        end,
+        mode = "n",
+        desc = "Paste above with highlight",
+      },
+    },
+    opts = {
+      animation = {
+        enabled = true,
+        duration = 220,
+        animation_type = "fade",
+        window_scoped = true,
+      },
+      highlights = {
+        undo = { hl = "Substitute" },
+        redo = { hl = "IncSearch" },
+        yank = { hl = "CurSearch" },
+        paste = { hl = "Visual" },
+      },
+    },
+    init = function()
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "LazyVimAutocmdsDefaults",
+        callback = function()
+          pcall(vim.api.nvim_del_augroup_by_name, "lazyvim_highlight_yank")
+        end,
+      })
+
+      vim.api.nvim_create_autocmd("TextYankPost", {
+        desc = "Highlight yanked text with undo-glow",
+        callback = function()
+          require("undo-glow").yank()
+        end,
+      })
+    end,
+  },
 
   {
     "rachartier/tiny-glimmer.nvim",

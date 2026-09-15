@@ -174,7 +174,19 @@ return {
   opts = {
     bigfile = { enabled = true },
     dashboard = { enabled = false },
-    explorer = { enabled = true },
+    explorer = {
+      enabled = true,
+      win = {
+        list = {
+          keys = {
+            ["Y"] = function(picker)
+              local item = picker:current()
+              require("shipglows.path").copy(item and (item.file or item.path))
+            end,
+          },
+        },
+      },
+    },
     indent = { enabled = true },
     input = { enabled = true },
     notifier = { enabled = false }, -- using nvim-notify
@@ -243,6 +255,7 @@ return {
           win = {
             list = {
               keys = {
+                ["<Esc>"] = "explorer_close",
                 ["<c-f>"] = "picker_files",
                 ["<c-g>"] = "picker_grep",
               },

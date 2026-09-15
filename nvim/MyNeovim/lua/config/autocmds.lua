@@ -14,7 +14,19 @@ vim.api.nvim_create_autocmd({ "WinEnter", "CursorHold" }, {
     group = reload_changed_files_group,
     desc = "Reload files changed outside Neovim",
     callback = function()
-        vim.cmd("checktime")
+        local bufnr = vim.api.nvim_get_current_buf()
+        local name = vim.api.nvim_buf_get_name(bufnr)
+        if name == "" then
+            return
+        end
+        local stat = vim.uv.fs_stat(name)
+        if stat and stat.type == "file" then
+            vim.schedule(function()
+                if vim.api.nvim_get_current_buf() == bufnr then
+                    vim.cmd("checktime")
+                end
+            end)
+        end
     end,
 })
 

@@ -1,7 +1,8 @@
 local M = {}
 local explorer_panel = require("config.explorer-panel")
 
-local SOURCES = { "filesystem", "buffers", "git_status" }
+local SOURCES = { "filesystem", "buffers", "git_status", "document_symbols" }
+local last_source = "filesystem"
 
 local function active_state()
   local mgr_ok, manager = pcall(require, "neo-tree.sources.manager")
@@ -18,7 +19,29 @@ local function active_state()
   return nil, nil
 end
 
+function M.toggle()
+  local active_source, state = active_state()
+  if active_source and state then
+    require("neo-tree.command").execute({ source = active_source, action = "close" })
+    return
+  end
+
+  local cmd_ok, cmd = pcall(require, "neo-tree.command")
+  if not cmd_ok then
+    vim.cmd("Neotree " .. last_source)
+    return
+  end
+  cmd.execute({ source = last_source, position = "left" })
+  vim.schedule(function()
+    local _, opened_state = active_state()
+    if opened_state then
+      explorer_panel.resize(opened_state.winid)
+    end
+  end)
+end
+
 function M.open(target_source, target_dir)
+  last_source = target_source
   local cmd_ok, cmd = pcall(require, "neo-tree.command")
   if not cmd_ok then
     vim.cmd("Neotree")

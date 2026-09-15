@@ -31,7 +31,21 @@ return {
       desc = "NeoTree (root)",
     },
     {
+      "<leader>eb",
+      function()
+        require("config.neotree-smart").open("buffers")
+      end,
+      desc = "NeoTree (buffers)",
+    },
+    {
       "<leader>ee",
+      function()
+        require("config.neotree-smart").toggle()
+      end,
+      desc = "NeoTree (toggle)",
+    },
+    {
+      "<leader>eg",
       function()
         require("config.neotree-smart").open("git_status")
       end,
@@ -40,6 +54,30 @@ return {
   },
   opts = function()
     local dir_git_cache = {}
+
+    local function collapse_or_close_tree(state)
+      local tree = state.tree
+      local node = tree and tree:get_node()
+      local root = tree and tree:get_nodes()[1]
+      if not node or not root then
+        return
+      end
+
+      if node:get_id() == root:get_id() then
+        require("neo-tree.command").execute({ source = state.name, action = "close" })
+        return
+      end
+
+      if not (node:has_children() and node:is_expanded()) then
+        local parent = tree:get_node(node:get_parent_id())
+        if parent and parent:get_id() == root:get_id() then
+          require("neo-tree.ui.renderer").focus_node(state, root:get_id())
+          return
+        end
+      end
+
+      require("neo-tree.sources.common.commands").close_node(state)
+    end
 
     local function normalize_status(status)
       if type(status) == "table" then
@@ -105,7 +143,7 @@ return {
       popup_border_style = "rounded",
       enable_git_status = true,
       enable_diagnostics = true,
-      sources = { "filesystem", "buffers", "git_status" },
+      sources = { "filesystem", "buffers", "git_status", "document_symbols" },
       event_handlers = {
         {
           event = "git_status_changed",
@@ -122,6 +160,10 @@ return {
         window = {
           mappings = {
             ["l"] = "open",
+            ["Y"] = function(state)
+              local node = state.tree:get_node()
+              require("shipglows.path").copy(node and node.path)
+            end,
           },
         },
         components = {
@@ -155,11 +197,21 @@ return {
           },
         },
       },
+      document_symbols = {
+        window = {
+          mappings = {
+            ["h"] = "close_node",
+            ["l"] = "toggle_node",
+            ["Z"] = "expand_all_nodes",
+          },
+        },
+      },
       window = {
         position = "left",
         width = explorer_panel.width,
         mappings = {
           ["<space>"] = "none",
+          ["<esc>"] = collapse_or_close_tree,
           ["l"] = "open",
           ["h"] = "close_node",
           ["<c-f>"] = function(state)
