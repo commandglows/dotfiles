@@ -587,7 +587,8 @@ Raccourcis actifs :
 - `:AvanteEdit` / `<leader>axe` : édition basée sélection/contexte.
 - `:AvanteFocus` / `<leader>axf` : focus fenêtre Avante.
 - `:AvanteHistory` / `<leader>axh` : historique des échanges.
-- `:AvanteModels` / `<leader>axm` : choisir un modèle.
+- `:AvanteModels` / `<leader>axm` : choisir un modèle de provider HTTP.
+- `:AvanteACPModels` / `<leader>axM` : choisir le modèle de l'agent ACP courant.
 - `:AvanteChatNew` / `<leader>axn` : nouvelle session.
 - `:AvanteSwitchProvider` / `<leader>axp` : changer le provider.
 - `:AvanteRefresh` / `<leader>axu` : rafraîchir la vue.

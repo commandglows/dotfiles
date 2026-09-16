@@ -1,6 +1,7 @@
 return {
   "akinsho/bufferline.nvim",
-  enabled = true,
+  -- Les buffers sont affiches par Tabby sur la ligne du haut.
+  enabled = false,
   lazy = false,
   priority = 3000,
   dependencies = { "nvim-tree/nvim-web-devicons" },

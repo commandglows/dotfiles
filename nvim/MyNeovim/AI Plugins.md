@@ -27,7 +27,8 @@ Si votre `leader` est celui par défaut de LazyVim, `<leader>` correspond en gé
 - `Espace a x q` : poser une question
 - `Espace a x e` : editer avec Avante
 - `Espace a x p` : changer de provider Avante
-- `Espace a x m` : choisir le modele Avante
+- `Espace a x m` : choisir le modele Avante des providers HTTP
+- `Espace a x M` : choisir le modele de l'agent ACP courant, par exemple Codex
 - `Espace a x s` : arrêter la génération et son processus ACP
 
 Avante lance directement le binaire natif `codex-acp`, afin que `:AvanteStop` et la fermeture normale de Neovim puissent arrêter le processus qu'ils possèdent. Il n'est donc pas nécessaire de fermer manuellement Codex ACP après chaque analyse. Après un crash brutal ou un arrêt forcé de la machine, un contrôle ponctuel des processus orphelins reste recommandé.

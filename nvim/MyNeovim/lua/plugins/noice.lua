@@ -1,7 +1,7 @@
 return {
   "folke/noice.nvim",
   enabled = true,
-  lazy = false, -- else flashes when opening
+  event = "VeryLazy",
   dependencies = {
     "MunifTanjim/nui.nvim",
     "rcarriga/nvim-notify",

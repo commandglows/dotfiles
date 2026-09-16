@@ -138,13 +138,92 @@ return {
       }
     end
 
+    local function is_avante_filetype(filetype)
+      return type(filetype) == "string" and filetype:match("^Avante") ~= nil
+    end
+
+    local function is_winfixbuf(winid)
+      if vim.fn.exists("&winfixbuf") ~= 1 then
+        return false
+      end
+      local ok, value = pcall(function()
+        return vim.wo[winid].winfixbuf
+      end)
+      return ok and value or false
+    end
+
+    local function is_edit_target_window(winid)
+      if not vim.api.nvim_win_is_valid(winid) then
+        return false
+      end
+      if vim.api.nvim_win_get_config(winid).relative ~= "" or is_winfixbuf(winid) then
+        return false
+      end
+
+      local buf = vim.api.nvim_win_get_buf(winid)
+      local filetype = vim.bo[buf].filetype
+      local buftype = vim.bo[buf].buftype
+      return filetype ~= "neo-tree"
+        and not is_avante_filetype(filetype)
+        and buftype ~= "terminal"
+        and buftype ~= "quickfix"
+    end
+
+    local function find_edit_target_window()
+      for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        if is_edit_target_window(winid) then
+          return winid
+        end
+      end
+      return nil
+    end
+
+    local function open_file_in_edit_window(args)
+      local path = args and args.path
+      if type(path) ~= "string" or path == "" then
+        return
+      end
+
+      local current_win = vim.api.nvim_get_current_win()
+      local target_win = find_edit_target_window()
+      if target_win then
+        vim.api.nvim_set_current_win(target_win)
+      else
+        vim.cmd("rightbelow vsplit")
+      end
+
+      local bufnr = args.bufnr
+      if type(bufnr) ~= "number" or bufnr < 0 then
+        bufnr = vim.fn.bufadd(path)
+      end
+      vim.cmd("buffer " .. bufnr)
+
+      if vim.api.nvim_win_is_valid(current_win) and vim.bo.filetype == "neo-tree" then
+        vim.api.nvim_set_current_win(current_win)
+      end
+
+      return { handled = true }
+    end
+
     return {
       close_if_last_window = true,
+      open_files_do_not_replace_types = {
+        "terminal",
+        "Trouble",
+        "qf",
+        "edgy",
+        "Avante",
+        "AvanteInput",
+      },
       popup_border_style = "rounded",
       enable_git_status = true,
       enable_diagnostics = true,
       sources = { "filesystem", "buffers", "git_status", "document_symbols" },
       event_handlers = {
+        {
+          event = "file_open_requested",
+          handler = open_file_in_edit_window,
+        },
         {
           event = "git_status_changed",
           handler = function(args)

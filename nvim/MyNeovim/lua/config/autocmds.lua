@@ -11,23 +11,23 @@ pcall(vim.api.nvim_del_augroup_by_name, "lazyvim_wrap_spell")
 local reload_changed_files_group = vim.api.nvim_create_augroup("reload_changed_files", { clear = true })
 
 vim.api.nvim_create_autocmd({ "WinEnter", "CursorHold" }, {
-    group = reload_changed_files_group,
-    desc = "Reload files changed outside Neovim",
-    callback = function()
-        local bufnr = vim.api.nvim_get_current_buf()
-        local name = vim.api.nvim_buf_get_name(bufnr)
-        if name == "" then
-            return
+  group = reload_changed_files_group,
+  desc = "Reload files changed outside Neovim",
+  callback = function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local name = vim.api.nvim_buf_get_name(bufnr)
+    if name == "" then
+      return
+    end
+    local stat = vim.uv.fs_stat(name)
+    if stat and stat.type == "file" then
+      vim.schedule(function()
+        if vim.api.nvim_get_current_buf() == bufnr then
+          vim.cmd("checktime")
         end
-        local stat = vim.uv.fs_stat(name)
-        if stat and stat.type == "file" then
-            vim.schedule(function()
-                if vim.api.nvim_get_current_buf() == bufnr then
-                    vim.cmd("checktime")
-                end
-            end)
-        end
-    end,
+      end)
+    end
+  end,
 })
 
 local function markdown_heading_level(line)
@@ -188,5 +188,12 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
     markdown_set_h1_fold_policy()
+  end,
+})
+
+vim.api.nvim_create_autocmd({ "ModeChanged" }, {
+  pattern = "*",
+  callback = function()
+    require("shipglows.ui_mode").apply_mode_colors()
   end,
 })

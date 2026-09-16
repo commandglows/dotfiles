@@ -1,7 +1,7 @@
 return {
   "rmagatti/auto-session",
   enabled = true,
-  lazy = false,
+  event = "VimEnter",
   ---@module "auto-session"
   ---@type AutoSession.Config
   opts = {
@@ -10,6 +10,8 @@ return {
     auto_save = true,
     suppressed_dirs = { "~/", "~/Downloads", "/" },
     close_filetypes_on_save = { "checkhealth", "lazy", "mason" },
+    pre_save_cmds = { "ScopeSaveState" },
+    post_restore_cmds = { "ScopeLoadState" },
     legacy_cmds = false,
     session_lens = {
       picker = "telescope",

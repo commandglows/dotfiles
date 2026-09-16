@@ -1,7 +1,7 @@
 return {
   "nvim-lualine/lualine.nvim",
   enabled = true,
-  lazy = false,
+  event = "VeryLazy",
   config = function()
     -- colorscheme kanagawa-wave
     -- stylua: ignore
@@ -18,34 +18,6 @@ return {
       blue     = '#A3D4D5',
       red      = '#E46876',
     }
-
-    local function section_color(fg, bg, gui)
-      local color = { fg = fg, bg = bg }
-      if gui then color.gui = gui end
-      return color
-    end
-
-    local function active_theme()
-      return {
-        a = section_color(colors.bg, colors.violet, "bold"),
-        b = section_color(colors.fg, colors.bg),
-        c = section_color(colors.fg, colors.bg),
-        x = section_color(colors.fg, colors.bg),
-        y = section_color(colors.fg, colors.bg),
-        z = section_color(colors.bg, colors.violet, "bold"),
-      }
-    end
-
-    local function inactive_theme()
-      return {
-        a = section_color(colors.fg, colors.bg),
-        b = section_color(colors.fg, colors.bg),
-        c = section_color(colors.fg, colors.bg),
-        x = section_color(colors.fg, colors.bg),
-        y = section_color(colors.fg, colors.bg),
-        z = section_color(colors.fg, colors.bg),
-      }
-    end
 
     local conditions = {
       buffer_not_empty = function()
@@ -67,25 +39,19 @@ return {
         component_separators = "",
         section_separators = "",
         disabled_filetypes = {
-          "AgenticChat",
-          "AgenticInput",
-          "AgenticCode",
-          "AgenticFiles",
-          "AgenticDiagnostics",
-          "AgenticTodos",
+          statusline = {
+            "AgenticChat",
+            "AgenticInput",
+            "AgenticCode",
+            "AgenticFiles",
+            "AgenticDiagnostics",
+            "AgenticTodos",
+          },
         },
-        theme = {
-          normal = active_theme(),
-          insert = active_theme(),
-          visual = active_theme(),
-          replace = active_theme(),
-          command = active_theme(),
-          inactive = inactive_theme(),
-        },
+        theme = require("shipglows.ui_mode").lualine_theme(),
         refresh = {
           statusline = 500,
           tabline = 1000,
-          winbar = 1000,
         },
       },
       sections = {
@@ -94,7 +60,7 @@ return {
         lualine_y = {},
         lualine_z = {},
         -- filled later
-        lualine_a = { { "mode", color = { fg = colors.bg, bg = colors.violet, gui = "bold" } } },
+        lualine_a = { "mode" },
         lualine_c = {},
         lualine_x = {},
       },
@@ -125,10 +91,14 @@ return {
     ins_left({
       function()
         local reg = vim.fn.reg_recording()
-        if reg == "" then return "" end
+        if reg == "" then
+          return ""
+        end
         return "recording @" .. reg
       end,
-      cond = function() return vim.fn.reg_recording() ~= "" end,
+      cond = function()
+        return vim.fn.reg_recording() ~= ""
+      end,
       icon = "\u{f111}",
       color = { fg = colors.red, gui = "bold" },
     })
@@ -136,13 +106,19 @@ return {
     -- Search count
     ins_left({
       function()
-        if vim.v.hlsearch == 0 then return "" end
+        if vim.v.hlsearch == 0 then
+          return ""
+        end
         local ok, c = pcall(vim.fn.searchcount, { maxcount = 999, timeout = 100 })
-        if not ok or not c or (c.total or 0) == 0 then return "" end
+        if not ok or not c or (c.total or 0) == 0 then
+          return ""
+        end
         return string.format("%d/%d", c.current or 0, c.total)
       end,
       cond = function()
-        if vim.v.hlsearch == 0 then return false end
+        if vim.v.hlsearch == 0 then
+          return false
+        end
         local ok, c = pcall(vim.fn.searchcount, { maxcount = 999, timeout = 100 })
         return ok and c and (c.total or 0) > 0
       end,
@@ -184,7 +160,9 @@ return {
       git_repo_cache.ts = vim.uv.now()
 
       vim.system({ "git", "-C", cwd, "status", "--porcelain=v1", "--branch" }, { text = true }, function(result)
-        if request_id ~= git_request_id then return end
+        if request_id ~= git_request_id then
+          return
+        end
 
         local modified, untracked, ahead, behind = 0, 0, 0, 0
         local in_repo = result.code == 0
@@ -193,8 +171,12 @@ return {
             if line:sub(1, 2) == "##" then
               local a = line:match("ahead (%d+)")
               local b = line:match("behind (%d+)")
-              if a then ahead = tonumber(a) end
-              if b then behind = tonumber(b) end
+              if a then
+                ahead = tonumber(a)
+              end
+              if b then
+                behind = tonumber(b)
+              end
             elseif line:sub(1, 2) == "??" then
               untracked = untracked + 1
             else
@@ -229,16 +211,28 @@ return {
     ins_left({
       function()
         local s = git_repo_stats()
-        if not s.in_repo then return "" end
+        if not s.in_repo then
+          return ""
+        end
         local parts = {}
-        if s.modified > 0 then table.insert(parts, "\u{f459}" .. s.modified) end
-        if s.untracked > 0 then table.insert(parts, "\u{f128}" .. s.untracked) end
-        if s.ahead > 0 then table.insert(parts, "\u{f55c}" .. s.ahead) end
-        if s.behind > 0 then table.insert(parts, "\u{f544}" .. s.behind) end
+        if s.modified > 0 then
+          table.insert(parts, "\u{f459}" .. s.modified)
+        end
+        if s.untracked > 0 then
+          table.insert(parts, "\u{f128}" .. s.untracked)
+        end
+        if s.ahead > 0 then
+          table.insert(parts, "\u{f55c}" .. s.ahead)
+        end
+        if s.behind > 0 then
+          table.insert(parts, "\u{f544}" .. s.behind)
+        end
         return table.concat(parts, " ")
       end,
       color = { fg = colors.yellow },
-      cond = function() return git_repo_stats().in_repo end,
+      cond = function()
+        return git_repo_stats().in_repo
+      end,
     })
 
     local function diff_source()
@@ -339,7 +333,9 @@ return {
     ins_right({
       function()
         local clients = vim.lsp.get_clients({ bufnr = 0 })
-        if #clients == 0 then return "" end
+        if #clients == 0 then
+          return ""
+        end
         local names = {}
         for _, c in ipairs(clients) do
           table.insert(names, c.name)
@@ -357,7 +353,9 @@ return {
     ins_right({
       function()
         local ok, lazy = pcall(require, "lazy.status")
-        if not ok then return "" end
+        if not ok then
+          return ""
+        end
         return lazy.has_updates() and lazy.updates() or ""
       end,
       cond = function()
@@ -371,7 +369,9 @@ return {
     local session_loaded = false
     vim.api.nvim_create_autocmd("User", {
       pattern = { "PersistenceLoadPost", "PersistenceSavePost" },
-      callback = function() session_loaded = true end,
+      callback = function()
+        session_loaded = true
+      end,
     })
     ins_right({
       function()
@@ -379,7 +379,9 @@ return {
       end,
       icon = "\u{f0c7}",
       color = { fg = colors.magenta },
-      cond = function() return session_loaded end,
+      cond = function()
+        return session_loaded
+      end,
     })
 
     ins_right({ custom_filetype })

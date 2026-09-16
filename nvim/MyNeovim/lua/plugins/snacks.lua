@@ -110,67 +110,107 @@ local function grep_in_selected_directory()
     if not choice or not choice.path then
       return
     end
-    Snacks.picker.grep({ cwd = choice.path })
+    require("snacks").picker.grep({ cwd = choice.path })
   end)
 end
 
 return {
   "folke/snacks.nvim",
   enabled = true,
-  priority = 1000,
   lazy = false,
-  keys = {
-    { "<leader>ff", LazyVim.pick("files", { root = false }), desc = "Find Files (cwd)" },
-    { "<leader>fF", LazyVim.pick("files"), desc = "Find Files (root dir)" },
-    { "<leader>fe", function() Snacks.explorer() end, desc = "Explorer Snacks (cwd)" },
-    { "<leader>fE", function() Snacks.explorer({ cwd = LazyVim.root() }) end, desc = "Explorer Snacks (root dir)" },
-    { "<leader>fr", function() Snacks.picker.recent({ filter = { cwd = true } }) end, desc = "Recent (cwd)" },
-    { "<leader>fR", LazyVim.pick("oldfiles"), desc = "Recent (root dir)" },
-    { "<leader>ft", function() Snacks.terminal() end, desc = "Terminal (cwd)" },
-    { "<leader>fT", function() Snacks.terminal(nil, { cwd = LazyVim.root() }) end, desc = "Terminal (root dir)" },
-    { "<leader>gD", function() Snacks.picker.git_diff({ base = "origin", group = true }) end, desc = "Git Diff Origin" },
-    { "<leader>sg", LazyVim.pick("live_grep", { root = false }), desc = "Grep (cwd)" },
-    { "<leader>sd", grep_in_selected_directory, desc = "Grep (pick dir)" },
-    { "<leader>sw", LazyVim.pick("grep_word", { root = false }), mode = { "n", "x" }, desc = "Visual selection or word (cwd)" },
-    { "<leader>sW", LazyVim.pick("grep_word"), mode = { "n", "x" }, desc = "Visual selection or word (root dir)" },
-  },
+  priority = 1000,
   init = function()
-    -- LazyVim references the global `Snacks` while resolving other plugin opts.
-    if not _G.Snacks then
-      _G.Snacks = require("snacks")
-    end
-
-    vim.api.nvim_create_autocmd("VimEnter", {
-      callback = function()
-        if vim.fn.argc() ~= 0 then
-          return
-        end
-
-        local listed_file_buffers = vim.tbl_filter(function(buf)
-          if not vim.api.nvim_buf_is_valid(buf) or vim.fn.buflisted(buf) ~= 1 then
-            return false
-          end
-          if vim.bo[buf].buftype ~= "" then
-            return false
-          end
-          return vim.api.nvim_buf_get_name(buf) ~= ""
-        end, vim.api.nvim_list_bufs())
-
-        if #listed_file_buffers > 0 then
-          return
-        end
-
-        local current_buf = vim.api.nvim_get_current_buf()
-        if vim.bo[current_buf].modified or vim.api.nvim_buf_get_name(current_buf) ~= "" then
-          return
-        end
-
-        vim.schedule(function()
-          require("config.neotree-smart").open("filesystem", vim.fn.getcwd())
-        end)
-      end,
-    })
+    require("snacks")
   end,
+  keys = {
+    {
+      "<leader>ff",
+      function()
+        require("snacks").picker.files({ cwd = vim.fn.getcwd() })
+      end,
+      desc = "Find Files (cwd)",
+    },
+    {
+      "<leader>fF",
+      function()
+        require("snacks").picker.files({ cwd = LazyVim.root() })
+      end,
+      desc = "Find Files (root dir)",
+    },
+    {
+      "<leader>fe",
+      function()
+        require("snacks").explorer()
+      end,
+      desc = "Explorer Snacks (cwd)",
+    },
+    {
+      "<leader>fE",
+      function()
+        require("snacks").explorer({ cwd = LazyVim.root() })
+      end,
+      desc = "Explorer Snacks (root dir)",
+    },
+    {
+      "<leader>fr",
+      function()
+        require("snacks").picker.recent({ filter = { cwd = true } })
+      end,
+      desc = "Recent (cwd)",
+    },
+    {
+      "<leader>fR",
+      function()
+        require("snacks").picker.recent()
+      end,
+      desc = "Recent (root dir)",
+    },
+    {
+      "<leader>ft",
+      function()
+        require("snacks").terminal()
+      end,
+      desc = "Terminal (cwd)",
+    },
+    {
+      "<leader>fT",
+      function()
+        require("snacks").terminal(nil, { cwd = LazyVim.root() })
+      end,
+      desc = "Terminal (root dir)",
+    },
+    {
+      "<leader>gD",
+      function()
+        require("snacks").picker.git_diff({ base = "origin", group = true })
+      end,
+      desc = "Git Diff Origin",
+    },
+    {
+      "<leader>sg",
+      function()
+        require("snacks").picker.grep({ cwd = vim.fn.getcwd() })
+      end,
+      desc = "Grep (cwd)",
+    },
+    { "<leader>sd", grep_in_selected_directory, desc = "Grep (pick dir)" },
+    {
+      "<leader>sw",
+      function()
+        require("snacks").picker.grep_word({ cwd = vim.fn.getcwd() })
+      end,
+      mode = { "n", "x" },
+      desc = "Visual selection or word (cwd)",
+    },
+    {
+      "<leader>sW",
+      function()
+        require("snacks").picker.grep_word({ cwd = LazyVim.root() })
+      end,
+      mode = { "n", "x" },
+      desc = "Visual selection or word (root dir)",
+    },
+  },
   opts = {
     bigfile = { enabled = true },
     dashboard = { enabled = false },
@@ -320,7 +360,11 @@ return {
     words = { enabled = true },
   },
   config = function(_, opts)
+    local notify = vim.notify
     require("snacks").setup(opts)
+    if LazyVim and LazyVim.has and LazyVim.has("noice.nvim") then
+      vim.notify = notify
+    end
     vim.api.nvim_set_hl(0, "SnacksPickerGitStatusModified", { fg = "#ff9e3b", bold = true })
     vim.api.nvim_set_hl(0, "SnacksPickerGitStatusAdded", { fg = "#98bb6c", bold = true })
     vim.api.nvim_set_hl(0, "SnacksPickerGitStatusDeleted", { fg = "#e46876", bold = true })

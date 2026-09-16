@@ -1,6 +1,8 @@
 -- Options are automatically loaded before lazy.nvim startup
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
+vim.g.trouble_lualine = false
+
 vim.opt.wrap = true
 vim.opt.linebreak = true
 vim.opt.fillchars:append({
@@ -30,6 +32,7 @@ vim.opt.sessionoptions = {
   "buffers",
   "curdir",
   "folds",
+  "globals",
   "help",
   "tabpages",
   "winsize",

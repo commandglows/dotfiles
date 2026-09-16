@@ -7,9 +7,10 @@ return {
     { "nvim-telescope/telescope.nvim" },
     { "taigrr/glaze.nvim" },
   },
-  init = function()
+  config = function(_, opts)
     local glaze = require("glaze")
     glaze.register("crush", "github.com/taigrr/crush", { plugin = "neocrush.nvim" })
+    require("neocrush").setup(opts)
   end,
   opts = {
     highlight_group = "IncSearch",

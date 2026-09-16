@@ -1,5 +1,5 @@
 return {
   "tree-sitter-grammars/tree-sitter-markdown",
-  enabled = false,
+  enabled = true,
   ft = "markdown",
 }

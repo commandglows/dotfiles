@@ -1,6 +1,6 @@
 return {
   "tadmccorkle/markdown.nvim",
-  enabled = false,
+  enabled = true,
   ft = "markdown",
   opts = {
     mappings = {

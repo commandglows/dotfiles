@@ -47,6 +47,8 @@ local function set_panel_preset(preset)
 end
 
 M.setup = function()
+  require("shipglows.progress").setup()
+
   local heading_modes = { "x" }
   local function setup_heading_keymaps(buf)
     local function map(mode, lhs, rhs, desc)

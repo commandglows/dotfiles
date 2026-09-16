@@ -9,12 +9,18 @@ vim.keymap.set("t", "<C-Space>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 -- Override the default <leader>e and <leader>E remaps from snacks_explorer extra
 pcall(vim.keymap.del, "n", "<leader>e")
 pcall(vim.keymap.del, "n", "<leader>E")
-vim.keymap.set("n", "<leader>es", function() Snacks.explorer() end, { desc = "Snacks Explorer (cwd)" })
-vim.keymap.set("n", "<leader>eS", function() Snacks.explorer({ cwd = LazyVim.root() }) end, { desc = "Snacks Explorer (root)" })
+vim.keymap.set("n", "<leader>es", function()
+  require("snacks").explorer()
+end, { desc = "Snacks Explorer (cwd)" })
+vim.keymap.set("n", "<leader>eS", function()
+  require("snacks").explorer({ cwd = LazyVim.root() })
+end, { desc = "Snacks Explorer (root)" })
 
 -- Move Buffers picker under Buffer group
 vim.keymap.del("n", "<leader>,")
-vim.keymap.set("n", "<leader>bf", function() Snacks.picker.buffers() end, { desc = "Find Buffers" })
+vim.keymap.set("n", "<leader>bf", function()
+  require("snacks").picker.buffers()
+end, { desc = "Find Buffers" })
 
 -- Move split commands under Windows group
 vim.keymap.del("n", "<leader>-")
@@ -27,8 +33,10 @@ vim.keymap.set("n", "<leader>r", "<cmd>checktime<cr>", { desc = "Reload changed 
 vim.keymap.set("n", "<leader>R", function()
   local init = vim.fn.stdpath("config") .. "/init.lua"
   vim.cmd("source " .. vim.fn.fnameescape(init))
-  vim.notify("Configuration Neovim rechargée", vim.log.levels.INFO)
-end, { desc = "Reload Neovim config" })
+  vim.cmd("redrawstatus!")
+  vim.cmd("redraw!")
+  vim.notify("Configuration et interface Neovim rechargées", vim.log.levels.INFO)
+end, { desc = "Reload Neovim config and UI" })
 
 -- Terminal submenu: open new terminals in horizontal/vertical splits
 vim.keymap.set("n", "<leader>th", function()
@@ -62,6 +70,77 @@ vim.keymap.set("i", "<S-Tab>", "<C-d>", { desc = "Desindenter" })
 vim.keymap.set("i", "<C-t>", "<Nop>", { desc = "Desactiver indentation" })
 vim.keymap.set("i", "<C-d>", "<Nop>", { desc = "Desactiver desindentation" })
 
+-- Espaces de travail : tabs natifs Neovim, dont Scope isole les buffers.
+vim.keymap.set("n", "]t", "<cmd>tabnext<cr>", { desc = "Espace suivant", silent = true })
+vim.keymap.set("n", "[t", "<cmd>tabprevious<cr>", { desc = "Espace precedent", silent = true })
+vim.keymap.set("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "Nouvel espace", silent = true })
+vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Fermer l'espace", silent = true })
+vim.keymap.set("n", "<leader><tab>o", "<cmd>tabonly<cr>", { desc = "Fermer les autres espaces", silent = true })
+vim.keymap.set("n", "<leader><tab>j", function()
+  local tab_name = require("tabby.feature.tab_name")
+  local scope = require("scope.core")
+  local spaces = {}
+
+  scope.revalidate()
+
+  for index, tabpage in ipairs(vim.api.nvim_list_tabpages()) do
+    table.insert(spaces, {
+      index = index,
+      tabpage = tabpage,
+      name = tab_name.get(tabpage),
+      buffer_count = #(scope.cache[tabpage] or {}),
+    })
+  end
+
+  vim.ui.select(spaces, {
+    prompt = "Choisir un espace :",
+    format_item = function(space)
+      local suffix = space.buffer_count > 1 and "buffers" or "buffer"
+      return string.format("%d  %s  (%d %s)", space.index, space.name, space.buffer_count, suffix)
+    end,
+  }, function(space)
+    if space then
+      vim.api.nvim_set_current_tabpage(space.tabpage)
+    end
+  end)
+end, { desc = "Choisir un espace" })
+vim.keymap.set("n", "<leader><tab>m", "<cmd>ScopeMoveBuf<cr>", { desc = "Deplacer le buffer", silent = true })
+vim.keymap.set("n", "<leader><tab>b", "<cmd>Telescope scope buffers<cr>", {
+  desc = "Buffers de tous les espaces",
+  silent = true,
+})
+vim.keymap.set("n", "<leader><tab>r", function()
+  vim.ui.input({ prompt = "Nom de l'espace : " }, function(name)
+    if not name or name == "" then
+      return
+    end
+    require("tabby.feature.tab_name").set(0, name)
+  end)
+end, { desc = "Renommer l'espace" })
+
+local function sync_workspace_number_keymaps()
+  for index = 1, 9 do
+    pcall(vim.keymap.del, "n", "<leader><tab>" .. index)
+  end
+
+  for index = 1, math.min(#vim.api.nvim_list_tabpages(), 9) do
+    vim.keymap.set("n", "<leader><tab>" .. index, function()
+      vim.cmd(index .. "tabnext")
+    end, {
+      desc = "Aller a l'espace " .. index,
+      silent = true,
+    })
+  end
+end
+
+sync_workspace_number_keymaps()
+vim.api.nvim_create_autocmd({ "TabNewEntered", "TabClosed" }, {
+  desc = "Synchroniser les raccourcis des espaces",
+  callback = function()
+    vim.schedule(sync_workspace_number_keymaps)
+  end,
+})
+
 local cheat_sheets = {
   {
     label = "Neovim",
@@ -79,7 +158,8 @@ local function open_cheat_sheet(sheet)
   local path = vim.fn.expand(sheet.path)
   local target = vim.uv.fs_realpath(path) or vim.fn.fnamemodify(path, ":p")
   local current_name = vim.api.nvim_buf_get_name(0)
-  local current = current_name ~= "" and (vim.uv.fs_realpath(current_name) or vim.fn.fnamemodify(current_name, ":p")) or ""
+  local current = current_name ~= "" and (vim.uv.fs_realpath(current_name) or vim.fn.fnamemodify(current_name, ":p"))
+    or ""
 
   local function close_and_return()
     local buf = vim.api.nvim_get_current_buf()

@@ -44,16 +44,93 @@ local function resolve_native_codex_acp(wrapper)
     local pnpm_home = os.getenv("PNPM_HOME")
 
     if appdata and appdata ~= "" then
-      table.insert(patterns, vim.fs.joinpath(appdata, "npm", "node_modules", "@zed-industries", "codex-acp", "node_modules", "@zed-industries", native_package, "bin", binary_name))
-      table.insert(patterns, vim.fs.joinpath(appdata, "npm", "node_modules", "@zed-industries", native_package, "bin", binary_name))
+      table.insert(
+        patterns,
+        vim.fs.joinpath(
+          appdata,
+          "npm",
+          "node_modules",
+          "@zed-industries",
+          "codex-acp",
+          "node_modules",
+          "@zed-industries",
+          native_package,
+          "bin",
+          binary_name
+        )
+      )
+      table.insert(
+        patterns,
+        vim.fs.joinpath(appdata, "npm", "node_modules", "@zed-industries", native_package, "bin", binary_name)
+      )
     end
 
     for _, root in ipairs({ localappdata and vim.fs.joinpath(localappdata, "pnpm") or nil, pnpm_home }) do
       if root and root ~= "" then
-        table.insert(patterns, vim.fs.joinpath(root, "global", "*", "node_modules", "@zed-industries", "codex-acp", "node_modules", "@zed-industries", native_package, "bin", binary_name))
-        table.insert(patterns, vim.fs.joinpath(root, "global", "*", "node_modules", ".pnpm", "node_modules", "@zed-industries", native_package, "bin", binary_name))
-        table.insert(patterns, vim.fs.joinpath(root, "global", "*", "*", "node_modules", "@zed-industries", "codex-acp", "node_modules", "@zed-industries", native_package, "bin", binary_name))
-        table.insert(patterns, vim.fs.joinpath(root, "global", "*", "*", "node_modules", ".pnpm", "node_modules", "@zed-industries", native_package, "bin", binary_name))
+        table.insert(
+          patterns,
+          vim.fs.joinpath(
+            root,
+            "global",
+            "*",
+            "node_modules",
+            "@zed-industries",
+            "codex-acp",
+            "node_modules",
+            "@zed-industries",
+            native_package,
+            "bin",
+            binary_name
+          )
+        )
+        table.insert(
+          patterns,
+          vim.fs.joinpath(
+            root,
+            "global",
+            "*",
+            "node_modules",
+            ".pnpm",
+            "node_modules",
+            "@zed-industries",
+            native_package,
+            "bin",
+            binary_name
+          )
+        )
+        table.insert(
+          patterns,
+          vim.fs.joinpath(
+            root,
+            "global",
+            "*",
+            "*",
+            "node_modules",
+            "@zed-industries",
+            "codex-acp",
+            "node_modules",
+            "@zed-industries",
+            native_package,
+            "bin",
+            binary_name
+          )
+        )
+        table.insert(
+          patterns,
+          vim.fs.joinpath(
+            root,
+            "global",
+            "*",
+            "*",
+            "node_modules",
+            ".pnpm",
+            "node_modules",
+            "@zed-industries",
+            native_package,
+            "bin",
+            binary_name
+          )
+        )
       end
     end
   end
@@ -64,14 +141,7 @@ local function resolve_native_codex_acp(wrapper)
     table.insert(
       patterns,
       1,
-      vim.fs.joinpath(
-        package_root,
-        "node_modules",
-        "@zed-industries",
-        native_package,
-        "bin",
-        binary_name
-      )
+      vim.fs.joinpath(package_root, "node_modules", "@zed-industries", native_package, "bin", binary_name)
     )
   end
 
@@ -98,7 +168,9 @@ local function resolve_codex_acp_command()
       os.getenv("LOCALAPPDATA") and vim.fs.joinpath(os.getenv("LOCALAPPDATA"), "pnpm", "bin", "codex-acp.cmd") or nil,
       os.getenv("PNPM_HOME") and vim.fs.joinpath(os.getenv("PNPM_HOME"), "codex-acp.cmd") or nil,
     }) do
-      if candidate then table.insert(candidates, candidate) end
+      if candidate then
+        table.insert(candidates, candidate)
+      end
     end
   end
 
@@ -136,7 +208,7 @@ local function env_or_default(name, default)
 end
 
 local function codex_acp_args()
-  local model = env_or_default("AVANTE_CODEX_MODEL", "gpt-5.4-mini")
+  local model = env_or_default("AVANTE_CODEX_MODEL", "gpt-5.5")
   local reasoning_effort = env_or_default("AVANTE_CODEX_REASONING_EFFORT", "medium")
   return {
     "-c",
@@ -146,12 +218,33 @@ local function codex_acp_args()
   }
 end
 
+local function codex_acp_model_options()
+  local models = vim.split(
+    env_or_default("AVANTE_CODEX_MODELS", "gpt-6-astra,gpt-5.6,gpt-5.6-sol,gpt-5.6-terra,gpt-5.6-luna,gpt-5.5"),
+    ",",
+    { plain = true, trimempty = true }
+  )
+  return vim
+    .iter(models)
+    :map(function(model)
+      model = vim.trim(model)
+      return model ~= ""
+          and {
+            name = model,
+            value = model,
+            description = "OpenAI Codex model",
+          }
+        or nil
+    end)
+    :totable()
+end
+
 return {
   "yetone/avante.nvim",
   enabled = true,
   version = "v0.2.3",
-  build = vim.fn.has("win32") ~= 0
-      and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
+  _codex_acp_model_options = codex_acp_model_options,
+  build = vim.fn.has("win32") ~= 0 and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
     or "make",
   init = function()
     vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
@@ -183,10 +276,6 @@ return {
   opts = {
     provider = "codex",
     selector = {
-      provider = "snacks",
-      provider_opts = {},
-    },
-    file_selector = {
       provider = "snacks",
       provider_opts = {
         layout = {
@@ -221,8 +310,10 @@ return {
         proxy = "http://127.0.0.1:8888",
       },
       cerebras = {
+        __inherited_from = "openai",
         endpoint = "https://api.cerebras.ai/v1",
         model = "llama3.1-70b",
+        api_key_name = "CEREBRAS_API_KEY",
       },
     },
     acp_providers = {
@@ -265,7 +356,7 @@ return {
     },
     windows = {
       width = 40, -- default % based on available width
-    sidebar_header = {
+      sidebar_header = {
         enabled = true,
         include_model = true,
       },
@@ -281,6 +372,8 @@ return {
     "AvanteFocus",
     "AvanteHistory",
     "AvanteModels",
+    "AvanteACPModels",
+    "AvanteACPModes",
     "AvanteRefresh",
     "AvanteShowRepoMap",
     "AvanteStop",
@@ -304,7 +397,9 @@ return {
     { "<leader>axa", "<cmd>AvanteAddFile<CR>", desc = "Avante Add File" },
     {
       "<leader>axc",
-      function() require("avante.api").ask({ ask = false }) end,
+      function()
+        require("avante.api").ask({ ask = false })
+      end,
       desc = "Avante Chat",
       mode = { "n", "v" },
     },
@@ -312,6 +407,7 @@ return {
     { "<leader>axf", "<cmd>AvanteFocus<CR>", desc = "Avante Focus" },
     { "<leader>axh", "<cmd>AvanteHistory<CR>", desc = "Avante History" },
     { "<leader>axm", "<cmd>AvanteModels<CR>", desc = "Avante Select Model" },
+    { "<leader>axM", "<cmd>AvanteACPModels<CR>", desc = "Avante Select ACP Model" },
     { "<leader>axn", "<cmd>AvanteChatNew<CR>", desc = "Avante New Chat" },
     { "<leader>axp", "<cmd>AvanteSwitchProvider<CR>", desc = "Avante Switch Provider" },
     { "<leader>axT", "<cmd>AvanteToggleToolMessages<CR>", desc = "Avante Toggle Tool Messages" },
@@ -319,7 +415,9 @@ return {
     { "<leader>axs", "<cmd>AvanteStop<CR>", desc = "Avante Stop" },
     {
       "<leader>axt",
-      function() require("avante").toggle_sidebar({ ask = false }) end,
+      function()
+        require("avante").toggle_sidebar({ ask = false })
+      end,
       desc = "Toggle Avante",
       mode = { "n", "v" },
     },
@@ -360,12 +458,20 @@ return {
       local bg = normal.bg or normal_float.bg
       local theme_hl = {}
 
-      if fg then theme_hl.fg = fg end
-      if bg then theme_hl.bg = bg end
+      if fg then
+        theme_hl.fg = fg
+      end
+      if bg then
+        theme_hl.bg = bg
+      end
 
       vim.api.nvim_set_hl(0, "AvanteSidebarNormal", vim.tbl_extend("force", { link = "Normal" }, theme_hl))
       vim.api.nvim_set_hl(0, "AvantePromptInput", vim.tbl_extend("force", { link = "Normal" }, theme_hl))
-      vim.api.nvim_set_hl(0, "AvantePromptInputBorder", vim.tbl_extend("force", { link = "WinSeparator" }, bg and { bg = bg } or {}))
+      vim.api.nvim_set_hl(
+        0,
+        "AvantePromptInputBorder",
+        vim.tbl_extend("force", { link = "WinSeparator" }, bg and { bg = bg } or {})
+      )
       vim.api.nvim_set_hl(0, "AvanteTitle", theme_hl)
       vim.api.nvim_set_hl(0, "AvanteSubtitle", theme_hl)
       vim.api.nvim_set_hl(0, "AvanteThirdTitle", theme_hl)
@@ -377,9 +483,15 @@ return {
     local function patch_avante_skip_explorer_panel_auto_file()
       local ok_sidebar, sidebar = pcall(require, "avante.sidebar")
       local ok_config, Config = pcall(require, "avante.config")
-      if not ok_sidebar or not ok_config or type(sidebar) ~= "table" then return end
-      if type(sidebar.initialize) ~= "function" then return end
-      if sidebar.__myneovim_skip_explorer_panel_auto_file_patch then return end
+      if not ok_sidebar or not ok_config or type(sidebar) ~= "table" then
+        return
+      end
+      if type(sidebar.initialize) ~= "function" then
+        return
+      end
+      if sidebar.__myneovim_skip_explorer_panel_auto_file_patch then
+        return
+      end
 
       local base_initialize = sidebar.initialize
 
@@ -392,7 +504,9 @@ return {
           Config.behaviour.auto_add_current_file = false
           local ok, result = pcall(base_initialize, self)
           Config.behaviour.auto_add_current_file = previous
-          if ok then return result end
+          if ok then
+            return result
+          end
           error(result)
         end
 
@@ -404,17 +518,25 @@ return {
 
     local function patch_avante_invalid_buffer_root()
       local ok, root = pcall(require, "avante.utils.root")
-      if not ok or type(root) ~= "table" or type(root.get) ~= "function" then return end
-      if root.__myneovim_invalid_buffer_root_patch then return end
+      if not ok or type(root) ~= "table" or type(root.get) ~= "function" then
+        return
+      end
+      if root.__myneovim_invalid_buffer_root_patch then
+        return
+      end
 
       local base_get = root.get
 
       local function fallback_project_root(bufnr)
         local cached = type(bufnr) == "number" and root.cache and root.cache[bufnr] or nil
-        if type(cached) == "string" and cached ~= "" then return cached end
+        if type(cached) == "string" and cached ~= "" then
+          return cached
+        end
 
         local cwd = vim.uv.cwd()
-        if cwd and cwd ~= "" then return cwd end
+        if cwd and cwd ~= "" then
+          return cwd
+        end
         return vim.fn.getcwd()
       end
 
@@ -437,30 +559,46 @@ return {
 
     local function patch_avante_horizontal_input_layout()
       local ok, sidebar = pcall(require, "avante.sidebar")
-      if not ok or type(sidebar) ~= "table" then return end
-      if sidebar.__avante_input_layout_patched then return end
+      if not ok or type(sidebar) ~= "table" then
+        return
+      end
+      if sidebar.__avante_input_layout_patched then
+        return
+      end
 
       local base_create_input_container = sidebar.create_input_container
       local function disable_input_redraw_autocmds(instance)
-        if vim.g.avante_compact_input == false then return end
-        if not instance or not instance.augroup or not instance.containers or not instance.containers.input then return end
+        if vim.g.avante_compact_input == false then
+          return
+        end
+        if not instance or not instance.augroup or not instance.containers or not instance.containers.input then
+          return
+        end
 
         local bufnr = instance.containers.input.bufnr
-        if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then return end
+        if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
+          return
+        end
 
-        for _, autocmd in ipairs(vim.api.nvim_get_autocmds({
-          group = instance.augroup,
-          buffer = bufnr,
-          event = { "TextChanged", "TextChangedI", "VimResized" },
-        })) do
+        for _, autocmd in
+          ipairs(vim.api.nvim_get_autocmds({
+            group = instance.augroup,
+            buffer = bufnr,
+            event = { "TextChanged", "TextChangedI", "VimResized" },
+          }))
+        do
           pcall(vim.api.nvim_del_autocmd, autocmd.id)
         end
       end
 
       local function compact_input_container(instance)
-        if vim.g.avante_compact_input == false then return end
+        if vim.g.avante_compact_input == false then
+          return
+        end
         local container = instance and instance.containers and instance.containers.input
-        if not container or not container.winid or not vim.api.nvim_win_is_valid(container.winid) then return end
+        if not container or not container.winid or not vim.api.nvim_win_is_valid(container.winid) then
+          return
+        end
 
         local bufnr = container.bufnr or vim.api.nvim_win_get_buf(container.winid)
         vim.wo[container.winid].signcolumn = "no"
@@ -478,7 +616,9 @@ return {
 
         local ok, err = pcall(base_create_input_container, self)
 
-        if original_get_layout then self.get_layout = original_get_layout end
+        if original_get_layout then
+          self.get_layout = original_get_layout
+        end
         if not ok then
           vim.notify("Avante input layout patch failed: " .. tostring(err), vim.log.levels.WARN)
         end
@@ -491,13 +631,19 @@ return {
 
     local function patch_avante_compact_input_hint()
       local ok_sidebar, sidebar = pcall(require, "avante.sidebar")
-      if not ok_sidebar or type(sidebar) ~= "table" then return end
-      if sidebar.__myneovim_compact_input_hint_patch then return end
+      if not ok_sidebar or type(sidebar) ~= "table" then
+        return
+      end
+      if sidebar.__myneovim_compact_input_hint_patch then
+        return
+      end
 
       local base_show_input_hint = sidebar.show_input_hint
       sidebar.show_input_hint = function(self)
         if vim.g.avante_compact_input ~= false then
-          if self.close_input_hint then self:close_input_hint() end
+          if self.close_input_hint then
+            self:close_input_hint()
+          end
           return
         end
         return base_show_input_hint(self)
@@ -508,13 +654,19 @@ return {
 
     local function patch_avante_escape_stop()
       local ok_sidebar, sidebar = pcall(require, "avante.sidebar")
-      if not ok_sidebar or type(sidebar) ~= "table" then return end
-      if sidebar.__myneovim_escape_stop_patch then return end
+      if not ok_sidebar or type(sidebar) ~= "table" then
+        return
+      end
+      if sidebar.__myneovim_escape_stop_patch then
+        return
+      end
 
       local base_setup_window_navigation = sidebar.setup_window_navigation
       sidebar.setup_window_navigation = function(self, container)
         base_setup_window_navigation(self, container)
-        if not container or not container.winid or not vim.api.nvim_win_is_valid(container.winid) then return end
+        if not container or not container.winid or not vim.api.nvim_win_is_valid(container.winid) then
+          return
+        end
 
         local bufnr = vim.api.nvim_win_get_buf(container.winid)
         vim.keymap.set({ "n", "i" }, "<Esc>", function()
@@ -532,8 +684,12 @@ return {
     local function patch_avante_hide_tool_messages()
       local ok_render, render = pcall(require, "avante.history.render")
       local ok_helpers, helpers = pcall(require, "avante.history.helpers")
-      if not ok_render or not ok_helpers then return end
-      if render.__myneovim_hide_tool_messages_patch then return end
+      if not ok_render or not ok_helpers then
+        return
+      end
+      if render.__myneovim_hide_tool_messages_patch then
+        return
+      end
 
       vim.g.avante_hide_tool_messages = vim.g.avante_hide_tool_messages ~= false
 
@@ -559,8 +715,12 @@ return {
 
     local function patch_avante_openai_nil_tool_result_content()
       local ok, openai = pcall(require, "avante.providers.openai")
-      if not ok or type(openai) ~= "table" or type(openai.parse_messages) ~= "function" then return end
-      if openai.__myneovim_nil_tool_result_content_patch then return end
+      if not ok or type(openai) ~= "table" or type(openai.parse_messages) ~= "function" then
+        return
+      end
+      if openai.__myneovim_nil_tool_result_content_patch then
+        return
+      end
 
       local base_parse_messages = openai.parse_messages
 
@@ -583,6 +743,139 @@ return {
       end
 
       openai.__myneovim_nil_tool_result_content_patch = true
+    end
+
+    local function patch_avante_acp_config_selector_open_sidebar()
+      local ok_selector, selector = pcall(require, "avante.acp_config_selector")
+      local ok_avante, avante = pcall(require, "avante")
+      if not ok_selector or not ok_avante then
+        return
+      end
+      if type(selector) ~= "table" or type(selector.open) ~= "function" then
+        return
+      end
+      if selector.__myneovim_open_sidebar_patch then
+        return
+      end
+
+      local base_open = selector.open
+      selector.open = function(category, prompt_label)
+        local sidebar = type(avante.get) == "function" and avante.get(false) or nil
+        local has_result = sidebar
+          and sidebar.containers
+          and sidebar.containers.result
+          and sidebar.containers.result.bufnr
+          and vim.api.nvim_buf_is_valid(sidebar.containers.result.bufnr)
+
+        if not has_result and type(avante.open_sidebar) == "function" then
+          avante.open_sidebar({ ask = false })
+          sidebar = type(avante.get) == "function" and avante.get(false) or sidebar
+        end
+
+        local ok_client, ACPClient = pcall(require, "avante.libs.acp_client")
+        if
+          ok_client
+          and type(ACPClient) == "table"
+          and type(ACPClient._myneovim_ensure_codex_model_options) == "function"
+          and sidebar
+          and sidebar.acp_client
+        then
+          ACPClient._myneovim_ensure_codex_model_options(sidebar.acp_client)
+        end
+
+        return base_open(category, prompt_label)
+      end
+
+      selector.__myneovim_open_sidebar_patch = true
+    end
+
+    local function patch_avante_codex_acp_model_options()
+      local ok_client, ACPClient = pcall(require, "avante.libs.acp_client")
+      if not ok_client or type(ACPClient) ~= "table" then
+        return
+      end
+      if ACPClient.__myneovim_codex_model_options_patch then
+        return
+      end
+
+      local base_convert_legacy_session_fields = ACPClient._convert_legacy_session_fields
+      local base_set_model = ACPClient.set_model
+
+      local function command_looks_like_codex(config)
+        local command = config and config.command
+        return type(command) == "string" and command:lower():find("codex%-acp", 1, false) ~= nil
+      end
+
+      local function ensure_model_options(client)
+        if not command_looks_like_codex(client.config) then
+          return
+        end
+
+        client.config_options = client.config_options or {}
+
+        local model_option
+        for _, option in ipairs(client.config_options) do
+          if option.category == "model" or option.id == "model" then
+            model_option = option
+            break
+          end
+        end
+
+        if not model_option then
+          model_option = {
+            id = "model",
+            name = "Model",
+            category = "model",
+            type = "select",
+            currentValue = env_or_default("AVANTE_CODEX_MODEL", "gpt-5.5"),
+            options = {},
+          }
+          table.insert(client.config_options, model_option)
+          client._legacy_api = true
+        end
+
+        model_option.options = model_option.options or {}
+        local seen = {}
+        for _, option in ipairs(model_option.options) do
+          if option.value then
+            seen[option.value] = true
+          end
+        end
+
+        for _, option in ipairs(codex_acp_model_options()) do
+          if not seen[option.value] then
+            table.insert(model_option.options, option)
+            seen[option.value] = true
+          end
+        end
+      end
+
+      ACPClient._myneovim_ensure_codex_model_options = ensure_model_options
+
+      ACPClient._convert_legacy_session_fields = function(self, result)
+        base_convert_legacy_session_fields(self, result)
+        ensure_model_options(self)
+      end
+
+      ACPClient.set_model = function(self, session_id, model_id, callback)
+        return base_set_model(self, session_id, model_id, function(config_options, err)
+          if err then
+            callback(config_options, err)
+            return
+          end
+
+          ensure_model_options(self)
+          for _, option in ipairs(self.config_options or {}) do
+            if option.category == "model" or option.id == "model" then
+              option.currentValue = model_id
+              break
+            end
+          end
+          callback(self.config_options, nil)
+        end)
+      end
+
+      ACPClient.__myneovim_codex_model_options_patch = true
     end
 
     local function clear_legacy_avante_keymaps()
@@ -622,6 +915,8 @@ return {
     patch_avante_escape_stop()
     patch_avante_hide_tool_messages()
     patch_avante_openai_nil_tool_result_content()
+    patch_avante_codex_acp_model_options()
+    patch_avante_acp_config_selector_open_sidebar()
     require("avante").setup(opts)
     vim.api.nvim_create_autocmd("FileType", {
       group = vim.api.nvim_create_augroup("MyNeovimAvanteInputKeyfix", { clear = true }),
